@@ -12,9 +12,7 @@ namespace :sneakers do
     # Enforsing ActiveJob-only workers
     AdvancedSneakersActiveJob.configure { |c| c.activejob_workers_strategy = :only }
 
-    config = AdvancedSneakersActiveJob.config.sneakers.dup
-    config[:log] = ActiveJob::Base.logger
-    Sneakers.configure(config)
+    Sneakers.configure(AdvancedSneakersActiveJob.config.sneakers)
 
     Rake::Task['sneakers:run'].invoke
   end

@@ -14,4 +14,12 @@ describe AdvancedSneakersActiveJob::Configuration, '.sneakers' do
       expect(subject.values_at(:exchange, :heartbeat)).to eq(['foobar', 30])
     end
   end
+
+  describe 'logger' do
+    subject { super()[:log] }
+
+    it 'is taken from ActiveJob' do
+      expect(subject).to eql(ActiveJob::Base.logger)
+    end
+  end
 end

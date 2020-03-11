@@ -23,7 +23,7 @@ module ActiveJob
           @monitor.synchronize do
             routing_key = job.respond_to?(:routing_key) ? job.routing_key : job.queue_name
 
-            ensure_queue_exists(job.queue_name, routing_key) if config.safe_publish
+            ensure_queue_exists(job.queue_name, routing_key) if safe_publish
 
             publisher.publish ActiveSupport::JSON.encode(job.serialize),
                               routing_key: routing_key,
@@ -37,26 +37,23 @@ module ActiveJob
 
         private
 
-        delegate :config, to: :AdvancedSneakersActiveJob
+        delegate :bind_by_queue_name, :sneakers, :safe_publish, to: :'AdvancedSneakersActiveJob.config'
 
         def ensure_queue_exists(queue_name, routing_key)
           @queues[queue_name] ||= begin
-            queue = publisher.channel.queue(queue_name, sneakers_config.fetch(:queue_options))
+            queue = publisher.channel.queue(queue_name, sneakers.fetch(:queue_options))
             queue.bind(publisher.exchange, routing_key: routing_key)
-            queue.bind(publisher.exchange, routing_key: queue_name) if queue_name != routing_key && config.bind_by_queue_name
+            queue.bind(publisher.exchange, routing_key: queue_name) if queue_name != routing_key && bind_by_queue_name
             true
           end
         end
 
         def publisher
           @publisher ||= begin
-            Sneakers.logger ||= ActiveJob::Base.logger
-            Sneakers::Publisher.new(sneakers_config).tap(&:ensure_connection!)
-          end
-        end
+            Sneakers.configure(sneakers) unless Sneakers.configured?
 
-        def sneakers_config
-          config.sneakers
+            Sneakers::Publisher.new(sneakers).tap(&:ensure_connection!)
+          end
         end
       end
 

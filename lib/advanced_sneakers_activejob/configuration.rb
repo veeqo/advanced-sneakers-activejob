@@ -11,7 +11,7 @@ module AdvancedSneakersActiveJob
     config_accessor(:activejob_workers_strategy) { :include } # [:include, :exclude, :only]
 
     def sneakers
-      config.sneakers || Sneakers::CONFIG
+      Sneakers::CONFIG.to_hash.deep_merge(config.sneakers || {})
     end
 
     def sneakers=(custom)

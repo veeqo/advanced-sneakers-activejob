@@ -1,4 +1,4 @@
-# `:advanced_sneakers` adapter for ActiveJob
+# `:advanced_sneakers` adapter for ActiveJob [![Build Status](https://travis-ci.com/veeqo/advanced-sneakers-activejob.svg?branch=master)](https://travis-ci.com/veeqo/advanced-sneakers-activejob)
 
 Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 

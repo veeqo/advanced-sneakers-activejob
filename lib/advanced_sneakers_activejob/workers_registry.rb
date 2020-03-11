@@ -8,6 +8,8 @@ module AdvancedSneakersActiveJob
 
     delegate :activejob_workers_strategy, to: :'AdvancedSneakersActiveJob.config'
 
+    delegate :empty?, to: :call
+
     def initialize
       @sneakers_workers = []
       @activejob_workers = []
@@ -21,24 +23,20 @@ module AdvancedSneakersActiveJob
       end
     end
 
-    # See https://github.com/jondot/sneakers/blob/7a972d22a58de8a261a738d9a1e5fb51f9608ede/lib/sneakers/workergroup.rb#L28
+    # Sneakers workergroup supports callable objects.
+    # https://github.com/jondot/sneakers/pull/210/files
+    # https://github.com/jondot/sneakers/blob/7a972d22a58de8a261a738d9a1e5fb51f9608ede/lib/sneakers/workergroup.rb#L28
     def call
       case activejob_workers_strategy
-      when :only
-        activejob_workers
-      when :exclude
-        sneakers_workers
-      when :include
-        sneakers_workers + activejob_workers
+      when :only    then activejob_workers
+      when :exclude then sneakers_workers
+      when :include then sneakers_workers + activejob_workers
       else
         raise "Unknown activejob_workers_strategy '#{activejob_workers_strategy}'"
       end
     end
 
-    def empty?
-      call.empty?
-    end
-
+    # For cleaner output on inspecting Sneakers::Worker::Classes in console.
     def inspect
       {
         sneakers_workers: sneakers_workers,

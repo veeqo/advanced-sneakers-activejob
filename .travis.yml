@@ -15,5 +15,5 @@ jobs:
     - rvm: 2.4.9
       env: RAILS_VERSION="~> 6.0.2"
 
-before_install: gem install bundler
+before_install: gem install bundler -v 1.17.3
 bundler_args: --jobs 3 --retry 3

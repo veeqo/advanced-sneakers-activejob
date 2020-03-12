@@ -3,6 +3,7 @@ Layout/LineLength:
 
 Metrics/BlockLength:
   Exclude:
+    - advanced-sneakers-activejob.gemspec
     - spec/**/*
 
 Metrics/MethodLength:
@@ -10,5 +11,17 @@ Metrics/MethodLength:
     - spec/**/*
 
 Security/MarshalLoad:
+  Exclude:
+    - spec/**/*
+
+Security/Eval:
+  Exclude:
+    - spec/apps/**/*
+
+Metrics/AbcSize:
+  Exclude:
+    - spec/**/*
+
+Lint/SuppressedException:
   Exclude:
     - spec/**/*

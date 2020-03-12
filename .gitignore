@@ -12,3 +12,9 @@
 
 # rspec failure tracking
 .rspec_status
+
+# sneakers pid file
+sneakers.pid
+
+# log files
+spec/apps/log/*

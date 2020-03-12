@@ -15,6 +15,10 @@ RSpec.configure do |config|
   end
 
   config.expect_with :rspec do |c|
+    c.max_formatted_output_length = nil # Do not truncate 'expected'/'got' data
+  end
+
+  config.expect_with :rspec do |c|
     c.syntax = :expect
   end
 end

@@ -18,3 +18,6 @@ sneakers.pid
 
 # log files
 spec/apps/log/*
+
+# temp files
+spec/apps/tmp/*

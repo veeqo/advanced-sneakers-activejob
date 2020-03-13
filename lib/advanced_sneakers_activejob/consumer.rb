@@ -16,7 +16,8 @@ module AdvancedSneakersActiveJob
       klass = Class.new(ActiveJob::QueueAdapters::AdvancedSneakersAdapter::JobWrapper)
       klass.include Sneakers::Worker
       const_set('Consumer', klass)
-      klass.from_queue(queue_name, AdvancedSneakersActiveJob.config.sneakers)
+      name = queue_name.respond_to?(:call) ? queue_name.call : queue_name
+      klass.from_queue(name, AdvancedSneakersActiveJob.config.sneakers)
     end
   end
 end

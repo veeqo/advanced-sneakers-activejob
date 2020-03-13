@@ -21,9 +21,10 @@ module ActiveJob
       class << self
         def enqueue(job) #:nodoc:
           @monitor.synchronize do
-            routing_key = job.respond_to?(:routing_key) ? job.routing_key : job.queue_name
+            queue_name = job.queue_name.respond_to?(:call) ? job.queue_name.call : job.queue_name
+            routing_key = job.respond_to?(:routing_key) ? job.routing_key : queue_name
 
-            ensure_queue_exists(job.queue_name, routing_key) if safe_publish
+            ensure_queue_exists(queue_name, routing_key) if safe_publish
 
             publisher.publish ActiveSupport::JSON.encode(job.serialize),
                               routing_key: routing_key,
@@ -56,6 +57,8 @@ module ActiveJob
           end
         end
       end
+
+      delegate :enqueue, :enqueue_at, to: :'ActiveJob::QueueAdapters::AdvancedSneakersAdapter' #compatibility with Rails 5+
 
       class JobWrapper #:nodoc:
         include Sneakers::Worker

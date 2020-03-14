@@ -24,7 +24,7 @@ module ActiveJob
             queue_name = job.queue_name.respond_to?(:call) ? job.queue_name.call : job.queue_name
             routing_key = job.respond_to?(:routing_key) ? job.routing_key : queue_name
 
-            ensure_queue_exists(queue_name, routing_key) if safe_publish
+            ensure_queue_exists(queue_name) if safe_publish
 
             publisher.publish ActiveSupport::JSON.encode(job.serialize),
                               routing_key: routing_key,
@@ -38,13 +38,12 @@ module ActiveJob
 
         private
 
-        delegate :bind_by_queue_name, :sneakers, :safe_publish, to: :'AdvancedSneakersActiveJob.config'
+        delegate :sneakers, :safe_publish, to: :'AdvancedSneakersActiveJob.config'
 
-        def ensure_queue_exists(queue_name, routing_key)
+        def ensure_queue_exists(queue_name)
           @queues[queue_name] ||= begin
             queue = publisher.channel.queue(queue_name, sneakers.fetch(:queue_options))
-            queue.bind(publisher.exchange, routing_key: routing_key)
-            queue.bind(publisher.exchange, routing_key: queue_name) if queue_name != routing_key && bind_by_queue_name
+            queue.bind(publisher.exchange, routing_key: queue_name)
             true
           end
         end

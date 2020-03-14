@@ -24,8 +24,12 @@ module RabbitmqHelpers
       create_vhost
     end
 
-    def queues
-      client.list_queues(vhost, columns: 'name,passive,durable,exclusive,auto_delete,arguments')
+    def queues(columns: %w[name passive durable exclusive auto_delete arguments])
+      client.list_queues(vhost, columns: columns.join(','))
+    end
+
+    def messages(queue, ackmode: 'ack_requeue_true', count: 1, encoding: 'auto')
+      client.get_messages(vhost, queue, ackmode: ackmode, count: count, encoding: encoding)
     end
 
     private
@@ -47,7 +51,7 @@ module RabbitmqHelpers
     end
   end
 
-  delegate :reset_vhost, :queues, to: :'RabbitmqHelpers.http_api', prefix: :rabbitmq
+  delegate :reset_vhost, :queues, :messages, to: :'RabbitmqHelpers.http_api', prefix: :rabbitmq
 end
 
 RSpec.configure do |config|

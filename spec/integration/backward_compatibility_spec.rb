@@ -20,33 +20,27 @@ describe 'Backward compatibility', :rabbitmq do
       # :advanced_sneakers adapter should cover same functionality
       ensure_application_job_works_with_advanced_sneakers
       expect(rabbitmq_queues).to include(expected_default_queue)
-      expect(logs('sneakers')).not_to match(/precondition/i)
+      expect_logs(name: 'sneakers', to_exclude: 'PRECONDITION')
     end
 
     def ensure_application_job_works_with_sneakers
       cleanup_logs
-      start_sneakers_consumers('with_sneakers_adapter')
+      start_sneakers_consumers(adapter: :sneakers)
+      in_app_process(adapter: :sneakers) { ApplicationJob.perform_later('sneakers') }
 
-      in_child_process('with_sneakers_adapter') do
-        ApplicationJob.perform_later('sneakers')
-        sleep(0.05)
-      end
-
-      expect(logs('rails')).to include('Performing ApplicationJob from Sneakers(default) with arguments: "sneakers"')
+      expect_logs name: 'rails',
+                  to_include: 'Performing ApplicationJob from Sneakers(default) with arguments: "sneakers"'
 
       stop_sneakers_consumers
     end
 
     def ensure_application_job_works_with_advanced_sneakers
       cleanup_logs
-      start_sneakers_consumers('with_advanced_sneakers_adapter')
+      start_sneakers_consumers(adapter: :advanced_sneakers)
+      in_app_process(adapter: :advanced_sneakers) { ApplicationJob.perform_later('advanced sneakers') }
 
-      in_child_process('with_advanced_sneakers_adapter') do
-        ApplicationJob.perform_later('advanced sneakers')
-        sleep(0.05)
-      end
-
-      expect(logs('rails')).to include('Performing ApplicationJob from AdvancedSneakers(default) with arguments: "advanced sneakers"')
+      expect_logs name: 'rails',
+                  to_include: 'Performing ApplicationJob from AdvancedSneakers(default) with arguments: "advanced sneakers"'
 
       stop_sneakers_consumers
     end
@@ -75,30 +69,26 @@ describe 'Backward compatibility', :rabbitmq do
 
     def ensure_custom_queue_job_does_not_with_sneakers
       cleanup_logs
-      start_sneakers_consumers('with_sneakers_adapter')
+      start_sneakers_consumers(adapter: :sneakers)
+      in_app_process(adapter: :sneakers) { CustomQueueJob.perform_later('sneakers') }
 
-      in_child_process('with_sneakers_adapter') do
-        CustomQueueJob.perform_later('sneakers')
-        sleep(0.05)
-      end
-
-      expect(logs('rails')).to include('Enqueued CustomQueueJob')
-      expect(logs('rails')).not_to include('Performing CustomQueueJob')
+      expect_logs name: 'rails',
+                  to_include: 'Enqueued CustomQueueJob',
+                  to_exclude: 'Performing CustomQueueJob'
 
       stop_sneakers_consumers
     end
 
     def ensure_custom_queue_job_works_with_advanced_sneakers
       cleanup_logs
-      start_sneakers_consumers('with_advanced_sneakers_adapter')
+      start_sneakers_consumers(adapter: :advanced_sneakers)
+      in_app_process(adapter: :advanced_sneakers) { CustomQueueJob.perform_later('advanced sneakers') }
 
-      in_child_process('with_advanced_sneakers_adapter') do
-        CustomQueueJob.perform_later('advanced sneakers')
-        sleep(0.05)
-      end
-
-      expect(logs('rails')).to include('Enqueued CustomQueueJob')
-      expect(logs('rails')).to include('Performing CustomQueueJob from AdvancedSneakers(custom) with arguments: "advanced sneakers"')
+      expect_logs name: 'rails',
+                  to_include: [
+                    'Enqueued CustomQueueJob',
+                    'Performing CustomQueueJob from AdvancedSneakers(custom) with arguments: "advanced sneakers"'
+                  ]
 
       stop_sneakers_consumers
     end

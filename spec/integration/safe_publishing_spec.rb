@@ -3,10 +3,9 @@
 describe 'Safe publishing', :rabbitmq do
   context 'when safe_publish is on' do
     subject do
-      in_child_process('with_advanced_sneakers_adapter') do
+      in_app_process(adapter: :advanced_sneakers) do
         AdvancedSneakersActiveJob.configure { |c| c.safe_publish = true }
         CustomQueueJob.perform_later('this message wond be lost')
-        true
       end
     end
 
@@ -26,10 +25,9 @@ describe 'Safe publishing', :rabbitmq do
 
   context 'when safe_publish is off' do
     subject do
-      in_child_process('with_advanced_sneakers_adapter') do
+      in_app_process(adapter: :advanced_sneakers) do
         AdvancedSneakersActiveJob.configure { |c| c.safe_publish = false }
         CustomQueueJob.perform_later('I have configured RMQ routing in advance')
-        true
       end
     end
 

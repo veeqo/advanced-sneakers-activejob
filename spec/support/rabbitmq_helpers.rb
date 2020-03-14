@@ -32,6 +32,10 @@ module RabbitmqHelpers
       client.get_messages(vhost, queue, ackmode: ackmode, count: count, encoding: encoding)
     end
 
+    def bindings(queue:, exchange: 'sneakers')
+      client.list_bindings_between_queue_and_exchange(vhost, queue, exchange)
+    end
+
     private
 
     def create_vhost
@@ -51,7 +55,7 @@ module RabbitmqHelpers
     end
   end
 
-  delegate :reset_vhost, :queues, :messages, to: :'RabbitmqHelpers.http_api', prefix: :rabbitmq
+  delegate :reset_vhost, :queues, :messages, :bindings, to: :'RabbitmqHelpers.http_api', prefix: :rabbitmq
 end
 
 RSpec.configure do |config|

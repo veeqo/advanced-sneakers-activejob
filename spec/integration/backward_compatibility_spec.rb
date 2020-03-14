@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# These tests check :adcanced_sneakers adapter might be a replacement for :sneakers adapter.
+# Most important is to verify that _same_ setup of RabbitMQ is used and on PRECONDITION FAILED errors appear.
+
 describe 'Backward compatibility', :rabbitmq do
   context 'when worker has no queue name defined' do
     let(:expected_default_queue) do
@@ -12,7 +15,7 @@ describe 'Backward compatibility', :rabbitmq do
       }
     end
 
-    it 'allows to replace :sneakers adapter with :advanced_sneakers adapter without' do
+    it 'allows drop-in replacement of :sneakers adapter with :advanced_sneakers adapter' do
       # :sneakers adapter creates consumer for "default" queue and all jobs are processed within it
       ensure_application_job_works_with_sneakers
       expect(rabbitmq_queues).to include(expected_default_queue)
@@ -57,7 +60,7 @@ describe 'Backward compatibility', :rabbitmq do
       }
     end
 
-    it 'allows to replace :sneakers adapter with :advanced_sneakers adapter without' do
+    it 'allows drop-in replacement of :sneakers adapter with :advanced_sneakers adapter' do
       # :sneakers adapter creates consumer only for "default" queue and all jobs for other queue are LOST
       ensure_custom_queue_job_does_not_with_sneakers
       expect(rabbitmq_queues).not_to include(expected_custom_queue)

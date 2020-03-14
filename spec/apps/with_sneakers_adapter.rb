@@ -13,6 +13,7 @@ class App < Rails::Application
   config.eager_load = true
   config.logger = Logger.new(Rails.root.join('log/rails.log'))
   config.logger.level = :debug
+  config.action_mailer.delivery_method = :test unless ENV['SKIP_MAILER']
 end
 
 App.initialize!

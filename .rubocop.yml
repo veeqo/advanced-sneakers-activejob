@@ -1,5 +1,7 @@
 Layout/LineLength:
   Max: 140
+  Exclude:
+    - spec/**/*
 
 Metrics/BlockLength:
   Exclude:

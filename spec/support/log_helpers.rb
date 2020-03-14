@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module LogHelpers
-  def logs(name, filters: [:job_id, :created_at])
+  def logs(name, filters: %i[job_id created_at])
     text = File.open(logs_path.join("#{name}.log")).read
 
     {

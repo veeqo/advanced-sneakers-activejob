@@ -58,7 +58,7 @@ module ActiveJob
         end
       end
 
-      delegate :enqueue, :enqueue_at, to: :'ActiveJob::QueueAdapters::AdvancedSneakersAdapter' #compatibility with Rails 5+
+      delegate :enqueue, :enqueue_at, to: :'ActiveJob::QueueAdapters::AdvancedSneakersAdapter' # compatibility with Rails 5+
 
       class JobWrapper #:nodoc:
         include Sneakers::Worker

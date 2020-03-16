@@ -63,9 +63,11 @@ module ActiveJob
         include Sneakers::Worker
         from_queue 'default' # no queue params here to preserve compatibility with default :sneakers adapter
 
-        def work_with_params(msg, _delivery_info, _metadata)
-          # TODO: bypass metadata to job (maybe check arity and append to args?)
-          Base.execute ActiveSupport::JSON.decode(msg)
+        def work_with_params(msg, delivery_info, headers)
+          decoded_message = ActiveSupport::JSON.decode(msg)
+          decoded_message['delivery_info'] = delivery_info
+          decoded_message['headers'] = headers
+          Base.execute decoded_message
           ack!
         end
       end

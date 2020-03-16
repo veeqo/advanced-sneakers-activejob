@@ -27,3 +27,6 @@ Metrics/AbcSize:
 Lint/SuppressedException:
   Exclude:
     - spec/**/*
+
+Style/Documentation:
+  Enabled: false

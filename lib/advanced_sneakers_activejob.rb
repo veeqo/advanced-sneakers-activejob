@@ -15,6 +15,9 @@ require 'advanced_sneakers_activejob/railtie' if defined?(::Rails::Railtie)
 require 'active_job/queue_adapters/advanced_sneakers_adapter'
 ActiveJob::Base.singleton_class.prepend(AdvancedSneakersActiveJob::Consumer)
 
+require 'advanced_sneakers_activejob/metadata'
+ActiveJob::Base.include AdvancedSneakersActiveJob::Metadata
+
 # Advanced Sneakers adapter for ActiveJob
 module AdvancedSneakersActiveJob
   class << self

@@ -8,6 +8,7 @@ Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 4. Allows to run ActiveJob consumers [separately](#how-to-separate-activejob-consumers) from manually defined Sneakers consumers
 5. [UPCOMING] Fallback to retries by DLX on job failure
 6. [UPCOMING] Limited support for `enqueue_at` by predefined delays (e.g. `[1.second, 10.seconds, 1.minute, 1.hour]`)
+7. Exposes `#delivery_info` & `#headers` AMQP metadata to job
 
 ## Installation
 
@@ -89,6 +90,24 @@ Sneakers comes with `rake sneakers:run` task, which would run all consumers (inc
 2. Run `rake sneakers:run` task to run native Sneakers consumers
 3. Run `rake sneakers:active_job` task to run ActiveJob consumers
 
+
+## AMQP metadata
+
+Each message in AMQP comes with `delivery_info` and `headers`. `:advanced_sneakers` adapter provides them on job level.
+
+```ruby
+class SomeComplexJob < ActiveJob::Base
+  before :perform do |job|
+    # metadata is available in callbacks
+    logger.debug({delivery_info: job.delivery_info, headers: job.headers})
+  end
+
+  def perform(msg)
+    # metadata is available here as well
+    logger.debug({delivery_info: delivery_info, headers: headers})
+  end
+end
+```
 
 ## Contributing
 

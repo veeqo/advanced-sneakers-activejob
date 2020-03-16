@@ -24,7 +24,7 @@ module ActiveJob
             queue_name = job.queue_name.respond_to?(:call) ? job.queue_name.call : job.queue_name
             routing_key = job.respond_to?(:routing_key) ? job.routing_key : queue_name
 
-            ensure_queue_exists(queue_name) if safe_publish
+            ensure_queue_exists(queue_name) if safe_publish && routing_key == queue_name
 
             publisher.publish ActiveSupport::JSON.encode(job.serialize),
                               routing_key: routing_key,

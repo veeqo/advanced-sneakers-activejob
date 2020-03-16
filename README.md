@@ -43,6 +43,7 @@ rake sneakers:active_job
 AdvancedSneakersActiveJob.configure do |config|
   # Ensure that queue & binding exist before message published.
   # By default Sneakers assumes queue binding routing key matches to queue name. So safe publish assumes the same.
+  # Safe publishing works only if job doesn't have custom routing key.
   config.safe_publish = true
 
   # Should Sneakers build-in runner (e.g. `rake sneakers:run`) run ActiveJob consumers?
@@ -73,7 +74,7 @@ class MyJob < ActiveJob::Base
   end
 
   def routing_key
-    # we have instance of job here (including job.arguments)
+    # we have instance of job here (including #arguments)
     'my.custom.routing.key'
   end
 end

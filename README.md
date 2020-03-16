@@ -8,7 +8,7 @@ Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 4. Allows to run ActiveJob consumers [separately](#how-to-separate-activejob-consumers) from manually defined Sneakers consumers
 5. [UPCOMING] Fallback to retries by DLX on job failure
 6. [UPCOMING] Limited support for `enqueue_at` by predefined delays (e.g. `[1.second, 10.seconds, 1.minute, 1.hour]`)
-7. Exposes `#delivery_info` & `#headers` AMQP metadata to job
+7. [Exposes `#delivery_info` & `#headers`](#amqp-metadata) AMQP metadata to job
 
 ## Installation
 

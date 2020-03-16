@@ -35,9 +35,11 @@ describe 'ActiveJob support of ActionMailer', :rabbitmq do
 
   context 'when Rails application has ActionMailer disabled' do
     let(:workers_class_names) do
-      in_app_process(adapter: :advanced_sneakers, env: { 'SKIP_MAILER' => '1' }) do
+      result, _error_logs = in_app_process(adapter: :advanced_sneakers, env: { 'SKIP_MAILER' => '1' }) do
         Sneakers::Worker::Classes.activejob_workers.map(&:name)
-      end.first
+      end
+
+      result
     end
 
     it 'does not have ActionMailer job consumer' do

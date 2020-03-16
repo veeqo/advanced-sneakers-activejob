@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'sourcify'
-
 # Runs separate ruby process and sends code snippet to it.
 # Expects app to evaluate the code and return marshalized result in STDOUT. Logs are expected to be written to STDERR
 module ChildProcessHelpers
@@ -12,7 +10,7 @@ module ChildProcessHelpers
 
     run_app_process(adapter: adapter, read: input_reader, write: output_writer, err: err_writer, env: env)
 
-    input_writer.write block.to_source(strip_enclosure: true) # Sending code block to separate process
+    input_writer.write source_code(block) # Sending code block to separate process
     input_writer.close # At this point child process starts to evaluate input
     input_reader.close
 
@@ -74,6 +72,20 @@ module ChildProcessHelpers
     end
   rescue Errno::ESRCH
     # process has died
+  end
+
+  def source_code(block)
+    code = block.source.strip
+
+    [
+      /\sdo\s(.*)end\Z/m,
+      /\{(.*)}\Z/m
+    ].each do |regex|
+      match = code[regex, 1]
+      return match unless match.nil?
+    end
+
+    raise "Unsupported block:\n#{code}"
   end
 end
 

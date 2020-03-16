@@ -26,9 +26,9 @@ module ActiveJob
 
             ensure_queue_exists(queue_name) if safe_publish && routing_key == queue_name
 
-            publisher.publish ActiveSupport::JSON.encode(job.serialize),
+            publisher.publish job.serialize,
                               routing_key: routing_key,
-                              content_type: 'application/json'
+                              content_type: AdvancedSneakersActiveJob::CONTENT_TYPE
           end
         end
 
@@ -64,10 +64,12 @@ module ActiveJob
         from_queue 'default' # no queue params here to preserve compatibility with default :sneakers adapter
 
         def work_with_params(msg, delivery_info, headers)
-          decoded_message = ActiveSupport::JSON.decode(msg)
-          decoded_message['delivery_info'] = delivery_info
-          decoded_message['headers'] = headers
-          Base.execute decoded_message
+          # compatibility with :sneakers adapter
+          msg = ActiveSupport::JSON.decode(msg) unless headers[:content_type] == AdvancedSneakersActiveJob::CONTENT_TYPE
+
+          msg['delivery_info'] = delivery_info
+          msg['headers'] = headers
+          Base.execute msg
           ack!
         end
       end

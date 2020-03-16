@@ -8,6 +8,7 @@ Sneakers::Worker.send(:remove_const, :Classes)
 Sneakers::Worker::Classes = AdvancedSneakersActiveJob::WorkersRegistry.new
 
 require 'advanced_sneakers_activejob/version'
+require 'advanced_sneakers_activejob/content_type'
 require 'advanced_sneakers_activejob/configuration'
 require 'advanced_sneakers_activejob/consumer'
 require 'advanced_sneakers_activejob/railtie' if defined?(::Rails::Railtie)

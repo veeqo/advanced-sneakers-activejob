@@ -96,4 +96,17 @@ describe 'Backward compatibility', :rabbitmq do
       stop_sneakers_consumers
     end
   end
+
+  context 'when worker with :advanced_sneakers adapter receives message published by :sneakers adapter' do
+    it 'processes message properly' do
+      cleanup_logs
+      start_sneakers_consumers(adapter: :advanced_sneakers)
+      in_app_process(adapter: :sneakers) { ApplicationJob.perform_later('sneakers') }
+
+      expect_logs name: 'rails',
+                  to_include: 'Performing ApplicationJob from AdvancedSneakers(default) with arguments: "sneakers"'
+
+      stop_sneakers_consumers
+    end
+  end
 end

@@ -24,7 +24,7 @@ describe 'AMQP metadata', :rabbitmq do
     expect_logs name: 'rails',
                 to_include: [
                   "My routing key is 'custom'",
-                  "My message content type is 'application/json'"
+                  "My message content type is 'application/vnd.activejob+json'"
                 ]
   end
 end

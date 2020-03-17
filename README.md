@@ -5,10 +5,10 @@ Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 1. Tries to [handle unrouted messages](#unrouted-messages)
 2. Respects `queue_as` of ActiveJob and uses correspondent RabbitMQ `queue` for consumers
 3. Supports [custom routing keys](#custom-routing-keys)
-4. Allows to run ActiveJob consumers [separately](#how-to-separate-activejob-consumers) from manually defined Sneakers consumers
+4. Allows to run ActiveJob consumers [separately](#how-to-separate-activejob-consumers) from native Sneakers consumers
 5. [UPCOMING] Support for `enqueue_at`
 6. [UPCOMING] Fallback to retries by DLX on job failure
-7. [Exposes `#delivery_info` & `#headers`](#amqp-metadata) AMQP metadata to job
+7. Exposes [`#delivery_info` & `#headers`](#amqp-metadata) AMQP metadata to job
 
 ## Installation
 
@@ -28,7 +28,7 @@ Or install it yourself as:
 
 ## Usage
 
-Configure ActiveJob adapter
+[Configure ActiveJob adapter](https://edgeguides.rubyonrails.org/active_job_basics.html#setting-the-backend)
 ```ruby
 config.active_job.queue_adapter = :advanced_sneakers
 ```
@@ -79,6 +79,7 @@ Sneakers comes with `rake sneakers:run` task, which would run all consumers (inc
 2. Run `rake sneakers:run` task to run native Sneakers consumers
 3. Run `rake sneakers:active_job` task to run ActiveJob consumers
 
+Tip: if you want to see how consumers are grouped, exec `Sneakers::Worker::Classes` in rails console.
 
 ## AMQP metadata
 

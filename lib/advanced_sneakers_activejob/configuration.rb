@@ -6,7 +6,7 @@ module AdvancedSneakersActiveJob
   class Configuration
     include ActiveSupport::Configurable
 
-    config_accessor(:safe_publish) { true } # creates queue & binding by queue name routing key before publish
+    config_accessor(:handle_unrouted_messages) { true } # create queue/binding and re-publish if message is unrouted
     config_accessor(:activejob_workers_strategy) { :include } # [:include, :exclude, :only]
 
     def sneakers

@@ -2,12 +2,12 @@
 
 Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 
-1. Creates queue & binding on publishing to ensure that message won't be lost (see `safe_publish` in [configuration](#configuration))
+1. Tries to [handle unrouted messages](#unrouted-messages)
 2. Respects `queue_as` of ActiveJob and uses correspondent RabbitMQ `queue` for consumers
 3. Supports [custom routing keys](#custom-routing-keys)
 4. Allows to run ActiveJob consumers [separately](#how-to-separate-activejob-consumers) from manually defined Sneakers consumers
-5. [UPCOMING] Fallback to retries by DLX on job failure
-6. [UPCOMING] Limited support for `enqueue_at` by predefined delays (e.g. `[1.second, 10.seconds, 1.minute, 1.hour]`)
+5. [UPCOMING] Support for `enqueue_at`
+6. [UPCOMING] Fallback to retries by DLX on job failure
 7. [Exposes `#delivery_info` & `#headers`](#amqp-metadata) AMQP metadata to job
 
 ## Installation
@@ -38,28 +38,17 @@ Run worker
 rake sneakers:active_job
 ```
 
-## Configuration
+## Unrouted messages
 
-```ruby
-AdvancedSneakersActiveJob.configure do |config|
-  # Ensure that queue & binding exist before message published.
-  # By default Sneakers assumes queue binding routing key matches to queue name. So safe publish assumes the same.
-  # Safe publishing works only if job doesn't have custom routing key.
-  config.safe_publish = true
+If message is published before routing has been configured (e.g. by consumer), it might be lost. To mitigate this problem the adapter uses [:mandatory](http://rubybunny.info/articles/exchanges.html#publishing_messages_as_mandatory) option for publishing messages. RabbitMQ returns unrouted messages back and the publisher is able to handle them:
 
-  # Should Sneakers build-in runner (e.g. `rake sneakers:run`) run ActiveJob consumers?
-  # :include - yes
-  # :exclude - no
-  # :only - Sneakers runner will run _only_ ActiveJob consumers
-  #
-  # This setting might be helpful if you want to run ActiveJob consumers apart from native Sneakers consumers.
-  # In that case set strategy to :exclude and use `rake sneakers:run` for native and `rake sneakers:active_job` for ActiveJob consumers
-  config.activejob_workers_strategy = :include
+1. Create queue
+2. Create binding
+3. Re-publish message
 
-  # Custom sneakers configuration for ActiveJob publisher & runner
-  config.sneakers = { } # actually fallbacks to Sneakers::CONFIG
-end
-```
+There is a setting `handle_unrouted_messages` in [configuration](#configuration) to disable this behavior. If it is disabled, publisher will only log unrouted messages.
+
+Take into accout that **this process is asynchronous**. It means that in case of network failures or process exit unrouted messages could be lost. Adapter tries to postpone application exit up to 30 seconds in case if there are unrouted messages, but it does not provide any guarantees.
 
 ## Custom routing keys
 
@@ -81,7 +70,7 @@ class MyJob < ActiveJob::Base
 end
 ```
 
-Take into accout that custom **routing key is used for publishing only**. Consumers are not aware about it. Ensure you have proper bindings before publishing or you might lose your messages.
+Take into accout that **custom routing key is used for publishing only**.
 
 ## How to separate ActiveJob consumers
 
@@ -106,6 +95,28 @@ class SomeComplexJob < ActiveJob::Base
     # metadata is available here as well
     logger.debug({delivery_info: delivery_info, headers: headers})
   end
+end
+```
+
+## Configuration
+
+```ruby
+AdvancedSneakersActiveJob.configure do |config|
+  # Should AdvancedSneakersActiveJob try to handle unrouted messages?
+  # There are still no guarantees that unrouted message is not lost in case of network failure or process exit.
+  config.handle_unrouted_messages = true
+
+  # Should Sneakers build-in runner (e.g. `rake sneakers:run`) run ActiveJob consumers?
+  # :include - yes
+  # :exclude - no
+  # :only - Sneakers runner will run _only_ ActiveJob consumers
+  #
+  # This setting might be helpful if you want to run ActiveJob consumers apart from native Sneakers consumers.
+  # In that case set strategy to :exclude and use `rake sneakers:run` for native and `rake sneakers:active_job` for ActiveJob consumers
+  config.activejob_workers_strategy = :include
+
+  # Custom sneakers configuration for ActiveJob publisher & runner
+  config.sneakers = { } # actually fallbacks to Sneakers::CONFIG
 end
 ```
 

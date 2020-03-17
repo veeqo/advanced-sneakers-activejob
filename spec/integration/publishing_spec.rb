@@ -21,22 +21,22 @@ describe 'Publishing', :rabbitmq do
     it 'publishes message with custom routing key' do
       subject
 
-      expect_logs name: 'sneakers',
-                  to_include: 'to [custom_routing_key]',
-                  to_exclude: 'to [foobar]'
+      expect_logs name: 'rails',
+                  to_include: 'with routing_key [custom_routing_key]',
+                  to_exclude: 'with routing_key [foobar]'
     end
   end
 
   context 'when job has no routing key method defined' do
-    context 'when safe_publish is on' do
+    context 'when handle_unrouted_messages is on' do
       subject do
         in_app_process(adapter: :advanced_sneakers) do
-          AdvancedSneakersActiveJob.configure { |c| c.safe_publish = true }
-          CustomQueueJob.perform_later('this message wond be lost')
+          AdvancedSneakersActiveJob.configure { |c| c.handle_unrouted_messages = true }
+          CustomQueueJob.perform_later("I don't want this message to be lost")
         end
       end
 
-      it 'creates queue before publishing' do
+      it 'creates proper queue' do
         expect do
           subject
         end.to change { rabbitmq_queues(columns: [:name]) }.from([]).to([{ 'name' => 'custom' }])
@@ -46,22 +46,29 @@ describe 'Publishing', :rabbitmq do
         subject
         message = rabbitmq_messages('custom').first
 
-        expect(message['payload']).to include('this message wond be lost')
+        expect(message['payload']).to include("I don't want this message to be lost")
       end
     end
 
-    context 'when safe_publish is off' do
+    context 'when handle_unrouted_messages is off' do
       subject do
         in_app_process(adapter: :advanced_sneakers) do
-          AdvancedSneakersActiveJob.configure { |c| c.safe_publish = false }
-          CustomQueueJob.perform_later('I have configured RMQ routing in advance')
+          AdvancedSneakersActiveJob.configure { |c| c.handle_unrouted_messages = false }
+          CustomQueueJob.perform_later("I don't care if message would be lost")
         end
       end
 
-      it 'does not create queue before publishing' do
+      it 'does not create queue' do
         expect do
           subject
         end.not_to change { rabbitmq_queues(columns: [:name]) }.from([])
+      end
+
+      it 'warns about lost message' do
+        subject
+
+        expect_logs name: 'rails',
+                    to_include: 'WARN -- : Message is not routed!'
       end
     end
   end

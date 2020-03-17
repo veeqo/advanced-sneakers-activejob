@@ -16,20 +16,10 @@ module ActiveJob
     #   Rails.application.config.active_job.queue_adapter = :advanced_sneakers
     class AdvancedSneakersAdapter
       @monitor = Monitor.new
-      @queues = {}
 
       class << self
         def enqueue(job) #:nodoc:
-          @monitor.synchronize do
-            queue_name = job.queue_name.respond_to?(:call) ? job.queue_name.call : job.queue_name
-            routing_key = job.respond_to?(:routing_key) ? job.routing_key : queue_name
-
-            ensure_queue_exists(queue_name) if safe_publish && routing_key == queue_name
-
-            publisher.publish job.serialize,
-                              routing_key: routing_key,
-                              content_type: AdvancedSneakersActiveJob::CONTENT_TYPE
-          end
+          publisher.publish(*publish_params(job))
         end
 
         def enqueue_at(*) #:nodoc:
@@ -38,22 +28,22 @@ module ActiveJob
 
         private
 
-        delegate :sneakers, :safe_publish, to: :'AdvancedSneakersActiveJob.config'
-
-        def ensure_queue_exists(queue_name)
-          @queues[queue_name] ||= begin
-            queue = publisher.channel.queue(queue_name, sneakers.fetch(:queue_options))
-            queue.bind(publisher.exchange, routing_key: queue_name)
-            true
+        def publish_params(job)
+          @monitor.synchronize do
+            [
+              Sneakers::ContentType.serialize(job.serialize, AdvancedSneakersActiveJob::CONTENT_TYPE),
+              { routing_key: routing_key(job) }
+            ]
           end
         end
 
-        def publisher
-          @publisher ||= begin
-            Sneakers.configure(sneakers) unless Sneakers.configured?
+        def routing_key(job)
+          queue_name = job.queue_name.respond_to?(:call) ? job.queue_name.call : job.queue_name
+          job.respond_to?(:routing_key) ? job.routing_key : queue_name
+        end
 
-            Sneakers::Publisher.new(sneakers).tap(&:ensure_connection!)
-          end
+        def publisher
+          @publisher ||= AdvancedSneakersActiveJob::Publisher.new
         end
       end
 

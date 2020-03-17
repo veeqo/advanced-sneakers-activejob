@@ -8,6 +8,8 @@ module AdvancedSneakersActiveJob
 
     config_accessor(:handle_unrouted_messages) { true } # create queue/binding and re-publish if message is unrouted
     config_accessor(:activejob_workers_strategy) { :include } # [:include, :exclude, :only]
+    config_accessor(:delay_proc) { ->(timestamp) { (timestamp - Time.now.to_f).round } } # seconds
+    config_accessor(:delayed_queue_prefix) { 'delayed' }
 
     def sneakers
       Sneakers::CONFIG.to_hash.deep_merge(config.sneakers || {}).merge(log: ActiveJob::Base.logger)

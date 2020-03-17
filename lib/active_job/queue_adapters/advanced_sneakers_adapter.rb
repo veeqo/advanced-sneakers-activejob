@@ -22,8 +22,14 @@ module ActiveJob
           publisher.publish(*publish_params(job))
         end
 
-        def enqueue_at(*) #:nodoc:
-          raise NotImplementedError, 'Use a queueing backend to enqueue jobs in the future. Read more at http://guides.rubyonrails.org/active_job_basics.html'
+        def enqueue_at(job, timestamp) #:nodoc:
+          delay = AdvancedSneakersActiveJob.config.delay_proc.call(timestamp).to_i
+
+          if delay.positive?
+            publisher.publish_delayed(*publish_params(job).tap { |params| params.last[:delay] = delay })
+          else
+            enqueue(job)
+          end
         end
 
         private

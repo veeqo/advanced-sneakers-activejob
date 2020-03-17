@@ -72,4 +72,66 @@ describe 'Publishing', :rabbitmq do
       end
     end
   end
+
+  context 'when job is delayed to a past date' do
+    subject do
+      in_app_process(adapter: :advanced_sneakers) do
+        CustomQueueJob.set(wait_until: 1.day.ago).perform_later('back to the future')
+      end
+    end
+
+    let(:message) { rabbitmq_messages('custom').first }
+
+    it 'is routed to queue for consumer' do
+      subject
+
+      expect(message['payload']).to include('back to the future')
+    end
+  end
+
+  context 'when job is delayed to a future' do
+    subject do
+      in_app_process(adapter: :advanced_sneakers) do
+        CustomQueueJob.set(wait: 5.minutes).perform_later('this will happen in 5 minutes')
+        CustomQueueJob.set(wait: 10.minutes).perform_later('this will happen in 10 minutes')
+      end
+    end
+
+    let(:expected_queues) do
+      [
+        {
+          'arguments' => {
+            'x-dead-letter-exchange' => 'sneakers',
+            'x-message-ttl' => 300_000, # 5 minute
+            'x-queue-mode' => 'lazy'
+          },
+          'auto_delete' => false,
+          'durable' => true,
+          'exclusive' => false,
+          'name' => 'delayed:300'
+        },
+        {
+          'arguments' => {
+            'x-dead-letter-exchange' => 'sneakers',
+            'x-message-ttl' => 600_000, # 10 minutes
+            'x-queue-mode' => 'lazy'
+          },
+          'auto_delete' => false,
+          'durable' => true,
+          'exclusive' => false,
+          'name' => 'delayed:600'
+        }
+      ]
+    end
+
+    it 'is routed to queue with proper TTL and DLX' do
+      subject
+
+      aggregate_failures do
+        expect(rabbitmq_queues).to eq expected_queues
+        expect(rabbitmq_messages('delayed:300').first['payload']).to include('this will happen in 5 minutes')
+        expect(rabbitmq_messages('delayed:600').first['payload']).to include('this will happen in 10 minutes')
+      end
+    end
+  end
 end

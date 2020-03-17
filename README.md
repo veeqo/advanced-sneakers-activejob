@@ -6,7 +6,7 @@ Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 2. Respects `queue_as` of ActiveJob and uses correspondent RabbitMQ `queue` for consumers
 3. Supports [custom routing keys](#custom-routing-keys)
 4. Allows to run ActiveJob consumers [separately](#how-to-separate-activejob-consumers) from native Sneakers consumers
-5. [UPCOMING] Support for `enqueue_at`
+5. Support for [`delayed jobs`](https://edgeguides.rubyonrails.org/active_job_basics.html#enqueue-the-job) `GuestsCleanupJob.set(wait: 1.week).perform_later(guest)`
 6. [UPCOMING] Fallback to retries by DLX on job failure
 7. Exposes [`#delivery_info` & `#headers`](#amqp-metadata) AMQP metadata to job
 
@@ -48,7 +48,9 @@ If message is published before routing has been configured (e.g. by consumer), i
 
 There is a setting `handle_unrouted_messages` in [configuration](#configuration) to disable this behavior. If it is disabled, publisher will only log unrouted messages.
 
-Take into accout that **this process is asynchronous**. It means that in case of network failures or process exit unrouted messages could be lost. Adapter tries to postpone application exit up to 30 seconds in case if there are unrouted messages, but it does not provide any guarantees.
+Take into accout that **this process is asynchronous**. It means that in case of network failures or process exit unrouted messages could be lost. The adapter tries to postpone application exit up to 30 seconds in case if there are unrouted messages, but it does not provide any guarantees.
+
+**Delayed messages are not handled!** If job is delayed `GuestsCleanupJob.set(wait: 1.week).perform_later(guest)` and there is no proper routing defined at the moment of job execution, it would be lost.
 
 ## Custom routing keys
 
@@ -105,6 +107,7 @@ end
 AdvancedSneakersActiveJob.configure do |config|
   # Should AdvancedSneakersActiveJob try to handle unrouted messages?
   # There are still no guarantees that unrouted message is not lost in case of network failure or process exit.
+  # Delayed unrouted messages are not handled.
   config.handle_unrouted_messages = true
 
   # Should Sneakers build-in runner (e.g. `rake sneakers:run`) run ActiveJob consumers?
@@ -115,6 +118,12 @@ AdvancedSneakersActiveJob.configure do |config|
   # This setting might be helpful if you want to run ActiveJob consumers apart from native Sneakers consumers.
   # In that case set strategy to :exclude and use `rake sneakers:run` for native and `rake sneakers:active_job` for ActiveJob consumers
   config.activejob_workers_strategy = :include
+
+  # All delayed messages delays are rounded to seconds.
+  config.delay_proc = ->(timestamp) { (timestamp - Time.now.to_f).round } } # integer result is expected
+
+  # Delayed queues can be filtered by this prefix (e.g. delayed:60 - queue for messages with 1 minute delay)
+  config.delayed_queue_prefix = 'delayed'
 
   # Custom sneakers configuration for ActiveJob publisher & runner
   config.sneakers = { } # actually fallbacks to Sneakers::CONFIG

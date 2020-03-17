@@ -3,6 +3,9 @@ Layout/LineLength:
   Exclude:
     - spec/**/*
 
+Metrics/ClassLength:
+  Enabled: false
+
 Metrics/BlockLength:
   Exclude:
     - advanced-sneakers-activejob.gemspec

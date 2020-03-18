@@ -37,7 +37,7 @@ module ChildProcessHelpers
   rescue TypeError
     # somebody writes to STDOUT? puts?
     data
-  rescue ArgumentError
+  rescue ArgumentError, NameError
     'Can not be unmarshalized' # Current process might not know classes of child process
   end
 

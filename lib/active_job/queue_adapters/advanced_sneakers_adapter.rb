@@ -56,9 +56,6 @@ module ActiveJob
       delegate :enqueue, :enqueue_at, to: :'ActiveJob::QueueAdapters::AdvancedSneakersAdapter' # compatibility with Rails 5+
 
       class JobWrapper #:nodoc:
-        include Sneakers::Worker
-        from_queue 'default' # no queue params here to preserve compatibility with default :sneakers adapter
-
         def work_with_params(msg, delivery_info, headers)
           # compatibility with :sneakers adapter
           msg = ActiveSupport::JSON.decode(msg) unless headers[:content_type] == AdvancedSneakersActiveJob::CONTENT_TYPE

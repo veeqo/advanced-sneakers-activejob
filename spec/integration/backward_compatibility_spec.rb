@@ -99,8 +99,14 @@ describe 'Backward compatibility', :rabbitmq do
 
   context 'when worker with :advanced_sneakers adapter receives message published by :sneakers adapter' do
     it 'processes message properly' do
+      start_sneakers_consumers(adapter: :sneakers) # previously only sneakers consumers were defining bindings
+      sleep 1
+      stop_sneakers_consumers
+
       cleanup_logs
+
       start_sneakers_consumers(adapter: :advanced_sneakers)
+
       in_app_process(adapter: :sneakers) { ApplicationJob.perform_later('sneakers') }
 
       expect_logs name: 'rails',

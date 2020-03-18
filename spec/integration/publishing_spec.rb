@@ -101,7 +101,7 @@ describe 'Publishing', :rabbitmq do
       [
         {
           'arguments' => {
-            'x-dead-letter-exchange' => 'sneakers',
+            'x-dead-letter-exchange' => 'activejob',
             'x-message-ttl' => 300_000, # 5 minute
             'x-queue-mode' => 'lazy'
           },
@@ -112,7 +112,7 @@ describe 'Publishing', :rabbitmq do
         },
         {
           'arguments' => {
-            'x-dead-letter-exchange' => 'sneakers',
+            'x-dead-letter-exchange' => 'activejob',
             'x-message-ttl' => 600_000, # 10 minutes
             'x-queue-mode' => 'lazy'
           },

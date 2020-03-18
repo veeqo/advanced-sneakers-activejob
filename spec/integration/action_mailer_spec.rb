@@ -21,11 +21,11 @@ describe 'ActiveJob support of ActionMailer', :rabbitmq do
       it 'processes emails' do
         cleanup_logs
         start_sneakers_consumers(adapter: :advanced_sneakers)
-        in_app_process(adapter: :sneakers) { SampleMailer.greetings(name: 'Advanced sneakers').deliver_later }
+        in_app_process(adapter: :advanced_sneakers) { SampleMailer.greetings(name: 'Advanced sneakers').deliver_later }
 
         expect_logs name: 'rails',
                     to_include: [
-                      'Enqueued ActionMailer::DeliveryJob to Sneakers(mailers) with arguments: "SampleMailer", "greetings", "deliver_now", {:name=>"Advanced sneakers"}',
+                      'Enqueued ActionMailer::DeliveryJob to AdvancedSneakers(mailers) with arguments: "SampleMailer", "greetings", "deliver_now", {:name=>"Advanced sneakers"}',
                       'Hello, Advanced sneakers',
                       'Performed ActionMailer::DeliveryJob'
                     ]

@@ -3,7 +3,7 @@
 Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 
 1. Tries to [handle unrouted messages](#unrouted-messages)
-2. Respects `queue_as` of ActiveJob and uses correspondent RabbitMQ `queue` for consumers
+2. Respects `queue_as` of ActiveJob and defines consumer class per RabbitMQ queue
 3. Supports [custom routing keys](#custom-routing-keys)
 4. Allows to run ActiveJob consumers [separately](#how-to-separate-activejob-consumers) from native Sneakers consumers
 5. Support for [`delayed jobs`](https://edgeguides.rubyonrails.org/active_job_basics.html#enqueue-the-job) `GuestsCleanupJob.set(wait: 1.week).perform_later(guest)`

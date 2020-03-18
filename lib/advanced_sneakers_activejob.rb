@@ -27,5 +27,16 @@ module AdvancedSneakersActiveJob
     def configure
       yield config
     end
+
+    def define_consumer(queue_name:)
+      @consumers ||= {}
+
+      @consumers[queue_name] ||= begin
+        klass = Class.new(ActiveJob::QueueAdapters::AdvancedSneakersAdapter::JobWrapper)
+        klass.include Sneakers::Worker
+        const_set([queue_name, 'queue_consumer'].join('_').classify, klass)
+        klass.from_queue(queue_name, AdvancedSneakersActiveJob.config.sneakers)
+      end
+    end
   end
 end

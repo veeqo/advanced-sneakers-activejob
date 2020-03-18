@@ -25,11 +25,9 @@ module AdvancedSneakersActiveJob
       private
 
       def define_consumer
-        klass = Class.new(ActiveJob::QueueAdapters::AdvancedSneakersAdapter::JobWrapper)
-        klass.include Sneakers::Worker
-        const_set('Consumer', klass)
         name = queue_name.respond_to?(:call) ? queue_name.call : queue_name
-        klass.from_queue(name, AdvancedSneakersActiveJob.config.sneakers)
+
+        AdvancedSneakersActiveJob.define_consumer(queue_name: name)
       end
     end
   end

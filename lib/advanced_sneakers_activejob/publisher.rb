@@ -138,7 +138,7 @@ module AdvancedSneakersActiveJob
       logger.warn('Some unrouted messages are lost on process exit!')
     end
 
-    def setup_routing_and_republish_message(message:, return_info:, **_)
+    def setup_routing_and_republish_message(message:, return_info:, properties:)
       logger.debug("Performing queue/binding setup & re-publish for unrouted message. #{{ message: message, return_info: return_info }}")
 
       routing_key = return_info.routing_key
@@ -146,7 +146,7 @@ module AdvancedSneakersActiveJob
       create_queue_and_binding(queue_name: deserialize(message).fetch('queue_name'), routing_key: routing_key)
 
       logger.debug "Re-publishing <#{message}> to [#{republish_exchange.name}] with routing_key [#{routing_key}]"
-      republish_exchange.publish(message, routing_key: routing_key, content_type: AdvancedSneakersActiveJob::CONTENT_TYPE)
+      republish_exchange.publish(message, properties.to_h.merge(routing_key: routing_key))
     end
 
     def create_queue_and_binding(queue_name:, routing_key:)
@@ -165,10 +165,7 @@ module AdvancedSneakersActiveJob
 
       create_delayed_queue_and_binding(queue_name: queue_name, delay: delay)
 
-      republish_delayed_exchange.publish message,
-                                         routing_key: return_info.routing_key,
-                                         content_type: AdvancedSneakersActiveJob::CONTENT_TYPE,
-                                         headers: properties.headers
+      republish_delayed_exchange.publish message, properties.to_h.merge(routing_key: return_info.routing_key)
     end
 
     def delayed_queue_name(delay:)

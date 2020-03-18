@@ -126,7 +126,9 @@ AdvancedSneakersActiveJob.configure do |config|
   config.delayed_queue_prefix = 'delayed'
 
   # Custom sneakers configuration for ActiveJob publisher & runner
-  config.sneakers = { } # actually fallbacks to Sneakers::CONFIG
+  config.sneakers = {
+    exchange: 'activejob'
+  }
 end
 ```
 

@@ -14,6 +14,8 @@ namespace :sneakers do
 
     Sneakers.configure(AdvancedSneakersActiveJob.config.sneakers)
 
+    Sneakers.logger.level = Logger::INFO # debug logs are too noizy because of bunny
+
     Rake::Task['sneakers:run'].invoke
   end
 end

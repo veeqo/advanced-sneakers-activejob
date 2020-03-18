@@ -7,7 +7,7 @@ Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 3. Supports [custom routing keys](#custom-routing-keys)
 4. Allows to run ActiveJob consumers [separately](#how-to-separate-activejob-consumers) from native Sneakers consumers
 5. Support for [`delayed jobs`](https://edgeguides.rubyonrails.org/active_job_basics.html#enqueue-the-job) `GuestsCleanupJob.set(wait: 1.week).perform_later(guest)`
-6. [UPCOMING] Fallback to retries by DLX on job failure
+6. [Exponential backoff\*](#exponential-backoff)
 7. Exposes [`#delivery_info` & `#headers`](#amqp-metadata) AMQP metadata to job
 
 ## Installation
@@ -83,6 +83,12 @@ Sneakers comes with `rake sneakers:run` task, which would run all consumers (inc
 
 Tip: if you want to see how consumers are grouped, exec `Sneakers::Worker::Classes` in rails console.
 
+## Exponential backoff\*
+
+The adapter enforces `AdvancedSneakersActiveJob::Handler` for ActiveJob consumers. This handler applies [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) if failure is not handled by ActiveJob [`rescue_from`/`retry_on`/`discard_on`](https://edgeguides.rubyonrails.org/active_job_basics.html#retrying-or-discarding-failed-jobs).
+
+\* For RabbitMQ queues amount optimization exponential backoff is not calculated by formula, but predifined. You can customize `retry_delay_proc` in [configuration](#configuration)
+
 ## AMQP metadata
 
 Each message in AMQP comes with `delivery_info` and `headers`. `:advanced_sneakers` adapter provides them on job level.
@@ -127,8 +133,12 @@ AdvancedSneakersActiveJob.configure do |config|
 
   # Custom sneakers configuration for ActiveJob publisher & runner
   config.sneakers = {
-    exchange: 'activejob'
+    exchange: 'activejob',
+    handler: AdvancedSneakersActiveJob::Handler
   }
+
+  # Define custom delay for retries, but remember - each unique delay leads to new queue on RabbitMQ side
+  config.retry_delay_proc = ->(count) { AdvancedSneakersActiveJob::EXPONENTIAL_BACKOFF[count] }
 end
 ```
 

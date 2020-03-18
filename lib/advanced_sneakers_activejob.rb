@@ -10,6 +10,8 @@ Sneakers::Worker::Classes = AdvancedSneakersActiveJob::WorkersRegistry.new
 
 require 'advanced_sneakers_activejob/version'
 require 'advanced_sneakers_activejob/content_type'
+require 'advanced_sneakers_activejob/exponential_backoff'
+require 'advanced_sneakers_activejob/handler'
 require 'advanced_sneakers_activejob/configuration'
 require 'advanced_sneakers_activejob/errors'
 require 'advanced_sneakers_activejob/publisher'
@@ -37,6 +39,10 @@ module AdvancedSneakersActiveJob
         const_set([queue_name, 'queue_consumer'].join('_').classify, klass)
         klass.from_queue(queue_name, AdvancedSneakersActiveJob.config.sneakers)
       end
+    end
+
+    def publisher
+      @publisher ||= AdvancedSneakersActiveJob::Publisher.new
     end
   end
 end

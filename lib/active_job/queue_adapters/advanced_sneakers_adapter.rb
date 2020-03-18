@@ -19,14 +19,14 @@ module ActiveJob
 
       class << self
         def enqueue(job) #:nodoc:
-          publisher.publish(*publish_params(job))
+          AdvancedSneakersActiveJob.publisher.publish(*publish_params(job))
         end
 
         def enqueue_at(job, timestamp) #:nodoc:
           delay = AdvancedSneakersActiveJob.config.delay_proc.call(timestamp).to_i
 
           if delay.positive?
-            publisher.publish_delayed(*publish_params(job).tap { |params| params.last[:delay] = delay })
+            AdvancedSneakersActiveJob.publisher.publish_delayed(*publish_params(job).tap { |params| params.last[:delay] = delay })
           else
             enqueue(job)
           end
@@ -46,10 +46,6 @@ module ActiveJob
         def routing_key(job)
           queue_name = job.queue_name.respond_to?(:call) ? job.queue_name.call : job.queue_name
           job.respond_to?(:routing_key) ? job.routing_key : queue_name
-        end
-
-        def publisher
-          @publisher ||= AdvancedSneakersActiveJob::Publisher.new
         end
       end
 

@@ -3,6 +3,7 @@
 require 'bundler/setup'
 require 'pry-byebug'
 require 'advanced/sneakers/activejob'
+require 'active_job/gem_version'
 
 Dir['./spec/support/**/*.rb'].sort.each { |f| require f }
 

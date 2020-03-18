@@ -20,12 +20,12 @@ module AdvancedSneakersActiveJob
       at_exit { wait_for_unrouted_messages_processing(timeout: WAIT_FOR_UNROUTED_MESSAGES_AT_EXIT_TIMEOUT) }
     end
 
-    def publish(message, routing_key:, headers: {}, properties: {})
+    def publish(message, routing_key:, headers: {}, **properties)
       ensure_connection!
 
       logger.debug "Publishing <#{message}> to [#{publish_exchange.name}] with routing_key [#{routing_key}]"
 
-      params = properties.merge(
+      params = properties.deep_symbolize_keys.merge(
         routing_key: routing_key,
         mandatory: true,
         content_type: AdvancedSneakersActiveJob::CONTENT_TYPE,
@@ -35,16 +35,16 @@ module AdvancedSneakersActiveJob
       publish_exchange.publish(message, params)
     end
 
-    def publish_delayed(message, routing_key:, delay:, headers: {}, properties: {})
+    def publish_delayed(message, routing_key:, delay:, headers: {}, **properties)
       ensure_connection!
 
       logger.debug "Publishing <#{message}> to [#{publish_delayed_exchange.name}] with routing_key [#{routing_key}] and delay [#{delay}]"
 
-      params = properties.merge(
+      params = properties.deep_symbolize_keys.merge(
         routing_key: routing_key,
         mandatory: true,
         content_type: AdvancedSneakersActiveJob::CONTENT_TYPE,
-        headers: headers.merge(delay: delay.to_i) # do not use x- prefix because headers exchanges ignore such headers
+        headers: headers.deep_symbolize_keys.merge(delay: delay.to_i) # do not use x- prefix because headers exchanges ignore such headers
       )
 
       publish_delayed_exchange.publish(message, params)

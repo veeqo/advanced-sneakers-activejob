@@ -18,7 +18,13 @@ module AdvancedSneakersActiveJob
     config_accessor(:retry_delay_proc) { ->(count) { AdvancedSneakersActiveJob::EXPONENTIAL_BACKOFF[count] } } # seconds
 
     def sneakers
-      Sneakers::CONFIG.to_hash.deep_merge(DEFAULT_SNEAKERS_CONFIG.deep_merge(config.sneakers || {}))
+      custom_config = DEFAULT_SNEAKERS_CONFIG.deep_merge(config.sneakers || {})
+
+      if custom_config[:amqp].present? & custom_config[:vhost].nil?
+        custom_config[:vhost] = AMQ::Settings.parse_amqp_url(custom_config[:amqp]).fetch(:vhost, '/')
+      end
+
+      Sneakers::CONFIG.to_hash.deep_merge(custom_config)
     end
 
     def sneakers=(custom)

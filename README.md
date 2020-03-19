@@ -86,6 +86,11 @@ Tip: if you want to see how consumers are grouped, exec `Sneakers::Worker::Class
 ## Exponential backoff\*
 
 The adapter enforces `AdvancedSneakersActiveJob::Handler` for ActiveJob consumers. This handler applies [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) if failure is not handled by ActiveJob [`rescue_from`/`retry_on`/`discard_on`](https://edgeguides.rubyonrails.org/active_job_basics.html#retrying-or-discarding-failed-jobs).
+Error name is tracked in `x-last-error-name`, error full message is tracked in `x-last-error-details` gzipped & encoded by Base64. To decode error details:
+
+```ruby
+ActiveSupport::Gzip.decompress(Base64.decode64(data_from_header))
+```
 
 \* For RabbitMQ queues amount optimization exponential backoff is not calculated by formula, but predifined. You can customize `retry_delay_proc` in [configuration](#configuration)
 

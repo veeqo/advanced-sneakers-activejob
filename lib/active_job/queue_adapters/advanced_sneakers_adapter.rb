@@ -38,14 +38,23 @@ module ActiveJob
           @monitor.synchronize do
             [
               Sneakers::ContentType.serialize(job.serialize, AdvancedSneakersActiveJob::CONTENT_TYPE),
-              { routing_key: routing_key(job) }
+              build_publish_params(job)
             ]
           end
         end
 
-        def routing_key(job)
-          queue_name = job.queue_name.respond_to?(:call) ? job.queue_name.call : job.queue_name
-          job.respond_to?(:routing_key) ? job.routing_key : queue_name
+        def build_publish_params(job)
+          params = job.class.publish_options.dup || {}
+
+          params.each do |key, value|
+            params[key] = value.call(job) if value.respond_to?(:call)
+          end
+
+          unless params.key?(:routing_key)
+            params[:routing_key] = job.queue_name.respond_to?(:call) ? job.queue_name.call : job.queue_name
+          end
+
+          params
         end
       end
 

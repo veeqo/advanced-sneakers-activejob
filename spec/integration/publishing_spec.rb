@@ -3,31 +3,7 @@
 describe 'Publishing', :rabbitmq do
   before { cleanup_logs }
 
-  context 'when job has "routing_key" method defined' do
-    subject do
-      in_app_process(adapter: :advanced_sneakers) do
-        class JobWithRoutingKey < ApplicationJob
-          queue_as :foobar
-
-          def routing_key
-            'custom_routing_key'
-          end
-        end
-
-        JobWithRoutingKey.perform_later('whatever')
-      end
-    end
-
-    it 'publishes message with custom routing key' do
-      subject
-
-      expect_logs name: 'rails',
-                  to_include: 'with routing_key [custom_routing_key]',
-                  to_exclude: 'with routing_key [foobar]'
-    end
-  end
-
-  context 'when job has no routing key method defined' do
+  context 'when job has no message options configured' do
     context 'when handle_unrouted_messages is on' do
       subject do
         in_app_process(adapter: :advanced_sneakers) do
@@ -69,6 +45,101 @@ describe 'Publishing', :rabbitmq do
 
         expect_logs name: 'rails',
                     to_include: 'WARN -- : Message is not routed!'
+      end
+    end
+  end
+
+  context 'when job has message options configured' do
+    context 'when static routing key is set' do
+      subject do
+        in_app_process(adapter: :advanced_sneakers) do
+          class JobWithRoutingKey < ApplicationJob
+            queue_as :foobar
+
+            message_options routing_key: 'custom_routing_key'
+          end
+
+          JobWithRoutingKey.perform_later('whatever')
+        end
+      end
+
+      it 'publishes message with custom routing key' do
+        subject
+
+        expect_logs name: 'rails',
+                    to_include: 'with routing_key [custom_routing_key]',
+                    to_exclude: 'with routing_key [foobar]'
+      end
+    end
+
+    context 'when routing key is set to nil' do
+      subject do
+        in_app_process(adapter: :advanced_sneakers) do
+          class JobWithRoutingKey < ApplicationJob
+            queue_as :foobar
+
+            message_options routing_key: nil
+          end
+
+          JobWithRoutingKey.perform_later('whatever')
+        end
+      end
+
+      it 'publishes message with custom routing key' do
+        subject
+
+        expect_logs name: 'rails',
+                    to_include: 'with routing_key []',
+                    to_exclude: 'with routing_key [foobar]'
+      end
+    end
+
+    context 'when routing key proc given' do
+      subject do
+        in_app_process(adapter: :advanced_sneakers) do
+          class JobWithRoutingKey < ApplicationJob
+            queue_as :foobar
+
+            message_options routing_key: ->(job) { ['user', job.arguments.first[:user_id]].join('.') }
+          end
+
+          JobWithRoutingKey.perform_later(user_id: 'hl3', message: 'Good morning, Mr. Freeman')
+        end
+      end
+
+      it 'publishes message with custom routing key' do
+        subject
+
+        expect_logs name: 'rails',
+                    to_include: 'with routing_key [user.hl3]',
+                    to_exclude: 'with routing_key [foobar]'
+      end
+    end
+
+    context 'when other message options are given' do
+      subject do
+        in_app_process(adapter: :advanced_sneakers) do
+          class JobWithRoutingKey < ApplicationJob
+            queue_as :foobar
+
+            message_options headers: { 'foo' => 'bar' }
+          end
+
+          JobWithRoutingKey.perform_later('whatever')
+        end
+      end
+
+      it 'publishes message with routing key equal to queue name' do
+        subject
+
+        expect_logs name: 'rails',
+                    to_include: 'with routing_key [foobar]'
+      end
+
+      it 'respects custom message options' do
+        subject
+
+        expect(rabbitmq_messages('foobar').first.properties.headers).to eq('foo' => 'bar')
       end
     end
   end

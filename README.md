@@ -5,7 +5,7 @@ Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 
 1. Tries to [handle unrouted messages](#unrouted-messages)
 2. Respects `queue_as` of ActiveJob and defines consumer class per RabbitMQ queue
-3. Supports [custom routing keys](#custom-routing-keys)
+3. Supports [custom message options](#custom-message-options)
 4. Allows to run ActiveJob consumers [separately](#how-to-separate-activejob-consumers) from native Sneakers consumers
 5. Support for [`delayed jobs`](https://edgeguides.rubyonrails.org/active_job_basics.html#enqueue-the-job) `GuestsCleanupJob.set(wait: 1.week).perform_later(guest)`
 6. [Exponential backoff\*](#exponential-backoff)
@@ -53,27 +53,40 @@ Take into accout that **this process is asynchronous**. It means that in case of
 
 **Delayed messages are not handled!** If job is delayed `GuestsCleanupJob.set(wait: 1.week).perform_later(guest)` and there is no proper routing defined at the moment of job execution, it would be lost.
 
-## Custom routing keys
+## Custom message options
 
-Advanced sneakers adapter supports customizable [routing keys](https://www.rabbitmq.com/tutorials/tutorial-four-ruby.html).
+Advanced sneakers adapter allows to set custom message options (e.g. [routing keys](https://www.rabbitmq.com/tutorials/tutorial-four-ruby.html)).
 
 ```ruby
 class MyJob < ActiveJob::Base
 
   queue_as :some_name
 
+  message_options routing_key: 'my.custom.routing.key',
+                  headers: { 'foo' => 'bar' }
+
   def perform(params)
     # ProcessData.new(params).call
-  end
-
-  def routing_key
-    # we have instance of job here (including #arguments)
-    'my.custom.routing.key'
   end
 end
 ```
 
-Take into accout that **custom routing key is used for publishing only**.
+Procs are also supported
+```ruby
+class MyJob < ActiveJob::Base
+
+  queue_as :some_name
+
+  message_options routing_key: ->(job) { "process_user_data.#{job.arguments.first.vip? ? 'urgent' : 'regular' }" }
+
+  def perform(user)
+    # ProcessUserData.new(user).call
+  end
+end
+```
+
+
+Take into accout that **custom message options are used for publishing only**.
 
 ## How to separate ActiveJob consumers
 

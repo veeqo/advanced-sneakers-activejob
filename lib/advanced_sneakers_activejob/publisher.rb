@@ -20,7 +20,7 @@ module AdvancedSneakersActiveJob
       at_exit { wait_for_unrouted_messages_processing(timeout: WAIT_FOR_UNROUTED_MESSAGES_AT_EXIT_TIMEOUT) }
     end
 
-    def publish(message, routing_key:, headers: {}, **properties)
+    def publish(message, routing_key: nil, headers: {}, **properties)
       ensure_connection!
 
       logger.debug "Publishing <#{message}> to [#{publish_exchange.name}] with routing_key [#{routing_key}]"
@@ -35,7 +35,7 @@ module AdvancedSneakersActiveJob
       publish_exchange.publish(message, params)
     end
 
-    def publish_delayed(message, routing_key:, delay:, headers: {}, **properties)
+    def publish_delayed(message, delay:, routing_key: nil, headers: {}, **properties)
       ensure_connection!
 
       logger.debug "Publishing <#{message}> to [#{publish_delayed_exchange.name}] with routing_key [#{routing_key}] and delay [#{delay}]"

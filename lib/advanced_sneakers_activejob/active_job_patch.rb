@@ -7,6 +7,8 @@ module AdvancedSneakersActiveJob
     included do
       # AMQP message contains metadata which might be helpful for consumer (e.g. job.delivery_info.routing_key)
       attr_accessor :delivery_info, :headers
+
+      class_attribute :publish_options, instance_accessor: false
     end
 
     module ClassMethods
@@ -20,6 +22,12 @@ module AdvancedSneakersActiveJob
       def queue_as(*args)
         super(*args)
         define_consumer
+      end
+
+      def message_options(options)
+        raise ArgumentError, 'message_options accepts Hash argument only' unless options.is_a?(Hash)
+
+        self.publish_options = options.symbolize_keys
       end
 
       private

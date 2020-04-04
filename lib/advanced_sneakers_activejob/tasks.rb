@@ -5,7 +5,7 @@ require 'sneakers/tasks'
 task :environment
 
 namespace :sneakers do
-  desc 'Start work for ActiveJob only (set $WORKERS=ActiveJobKlass1::Consumer,ActiveJobKlass2::Consumer)'
+  desc 'Start work for ActiveJob only (set $WORKERS=AdvancedSneakersActiveJob::FooQueueConsumer for processing of :foo queue)'
   task :active_job do
     Rake::Task['environment'].invoke
 

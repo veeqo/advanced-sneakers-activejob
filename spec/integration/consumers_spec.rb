@@ -20,18 +20,20 @@ describe 'Consumers' do
 
         AdvancedSneakersActiveJob.configure { |c| c.activejob_workers_strategy = :only }
 
-        Sneakers::Worker::Classes.call.map(&:name)
+        Sneakers::Worker::Classes.call.map { |consumer| [consumer.name, consumer.queue_name] }.to_h
       end
     end
 
     it 'are defined per queue' do
-      expect(subject.first).to match_array [
-        'AdvancedSneakersActiveJob::DefaultQueueConsumer', # default consumer
-        'AdvancedSneakersActiveJob::MailersQueueConsumer', # action mailer consumer
-        'AdvancedSneakersActiveJob::CustomQueueConsumer', # see CustomQueueJob in spec/apps/app/jobs
-        'AdvancedSneakersActiveJob::BazQueueConsumer', # baz queue consumer for FooJob and BarJob
-        'AdvancedSneakersActiveJob::DynamicQueueConsumer' # dynamic queue consumer for DynamicQueueJob
-      ]
+      expected_consumers = {
+        'AdvancedSneakersActiveJob::DefaultConsumer' => 'default', # default consumer
+        'AdvancedSneakersActiveJob::MailersConsumer' => 'mailers', # action mailer consumer
+        'AdvancedSneakersActiveJob::CustomConsumer' => 'custom', # see CustomQueueJob in spec/apps/app/jobs
+        'AdvancedSneakersActiveJob::BazConsumer' => 'baz', # baz queue consumer for FooJob and BarJob
+        'AdvancedSneakersActiveJob::DynamicConsumer' => 'dynamic' # dynamic queue consumer for DynamicQueueJob
+      }
+
+      expect(subject.first).to eq(expected_consumers)
     end
   end
 
@@ -54,18 +56,20 @@ describe 'Consumers' do
 
         AdvancedSneakersActiveJob.configure { |c| c.activejob_workers_strategy = :only }
 
-        Sneakers::Worker::Classes.call.map(&:name)
+        Sneakers::Worker::Classes.call.map { |consumer| [consumer.name, consumer.queue_name] }.to_h
       end
     end
 
-    it 'are defined per queue with prefix ignored' do
-      expect(subject.first).to match_array [
-        'AdvancedSneakersActiveJob::DefaultQueueConsumer', # default consumer
-        'AdvancedSneakersActiveJob::MailersQueueConsumer', # action mailer consumer
-        'AdvancedSneakersActiveJob::CustomQueueConsumer', # see CustomQueueJob in spec/apps/app/jobs
-        'AdvancedSneakersActiveJob::BazQueueConsumer', # baz queue consumer for FooJob and BarJob
-        'AdvancedSneakersActiveJob::DynamicQueueConsumer' # dynamic queue consumer for DynamicQueueJob
-      ]
+    it 'are defined per queue with prefix ignored in consumer class name' do
+      expected_consumers = {
+        'AdvancedSneakersActiveJob::CustomDefaultConsumer' => 'custom:default', # default consumer
+        'AdvancedSneakersActiveJob::CustomMailersConsumer' => 'custom:mailers', # action mailer consumer
+        'AdvancedSneakersActiveJob::CustomCustomConsumer' => 'custom:custom', # see CustomQueueJob in spec/apps/app/jobs
+        'AdvancedSneakersActiveJob::CustomBazConsumer' => 'custom:baz', # baz queue consumer for FooJob and BarJob
+        'AdvancedSneakersActiveJob::CustomDynamicConsumer' => 'custom:dynamic' # dynamic queue consumer for DynamicQueueJob
+      }
+
+      expect(subject.first).to eq(expected_consumers)
     end
   end
 end

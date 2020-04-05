@@ -33,7 +33,6 @@ module AdvancedSneakersActiveJob
       private
 
       def define_consumer
-        Rails.logger.warn queue_name_without_prefix
         AdvancedSneakersActiveJob.define_consumer(queue_name: queue_name_without_prefix)
       end
 

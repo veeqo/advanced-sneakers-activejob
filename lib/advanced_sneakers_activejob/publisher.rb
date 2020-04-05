@@ -170,9 +170,9 @@ module AdvancedSneakersActiveJob
 
     def delayed_queue_name(delay:)
       [
-        config_delayed_queue_prefix,
-        delay
-      ].join(':')
+        ::ActiveJob::Base.queue_name_prefix,
+        [config_delayed_queue_prefix, delay].join(':')
+      ].compact.join(::ActiveJob::Base.queue_name_delimiter)
     end
 
     def create_delayed_queue_and_binding(queue_name:, delay:)

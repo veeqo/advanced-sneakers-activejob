@@ -1,4 +1,6 @@
-## Changes Between 0.2.0 and 0.2.1 (unreleased)
+## Changes Between 0.2.0 and 0.2.1
+
+### Support for ActiveJob prefix https://github.com/veeqo/advanced-sneakers-activejob/pull/2
 
 Fixed worker class name in rake task description
 

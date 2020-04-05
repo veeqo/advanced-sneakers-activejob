@@ -31,18 +31,36 @@ module AdvancedSneakersActiveJob
     end
 
     def define_consumer(queue_name:)
-      @consumers ||= {}
+      name = consumer_name(queue_name: queue_name)
 
-      @consumers[queue_name] ||= begin
-        klass = Class.new(ActiveJob::QueueAdapters::AdvancedSneakersAdapter::JobWrapper)
-        klass.include Sneakers::Worker
-        const_set([queue_name, 'queue_consumer'].join('_').classify, klass)
-        klass.from_queue(queue_name, AdvancedSneakersActiveJob.config.sneakers)
-      end
+      return const_get(name) if const_defined?(name)
+
+      klass = Class.new(ActiveJob::QueueAdapters::AdvancedSneakersAdapter::JobWrapper)
+      const_set(name, klass)
+      klass.include Sneakers::Worker
+      klass.from_queue(queue_name, AdvancedSneakersActiveJob.config.sneakers)
+
+      klass
     end
 
     def publisher
       @publisher ||= AdvancedSneakersActiveJob::Publisher.new
+    end
+
+    # Based on ActiveSupport::Inflector#parameterize
+    def consumer_name(queue_name:)
+      # replace accented chars with their ascii equivalents
+      parameterized_string = ::ActiveSupport::Inflector.transliterate(queue_name)
+      # Turn unwanted chars into the separator
+      parameterized_string.gsub!(/[^a-z0-9\-_]+/, '_')
+      # No more than one of the separator in a row.
+      parameterized_string.gsub!(/_{2,}/, '_')
+      # Remove leading/trailing separator.
+      parameterized_string.gsub!(/^_|_$/, '')
+      # Ruby does not allow classes with leading digits
+      parameterized_string.gsub!(/\A(\d)/, 'queue\1')
+
+      [parameterized_string, 'consumer'].join('_').classify
     end
   end
 end

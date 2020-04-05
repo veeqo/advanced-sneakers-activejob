@@ -252,5 +252,74 @@ describe 'Publishing', :rabbitmq do
         end
       end
     end
+
+    context 'when ActiveJob has queue name prefix configured' do
+      subject do
+        in_app_process(adapter: :advanced_sneakers, env: { 'ACTIVE_JOB_QUEUE_NAME_PREFIX' => 'custom', 'ACTIVE_JOB_QUEUE_NAME_DELIMITER' => '~' }) do
+          CustomQueueJob.set(wait: 5.minutes).perform_later('this will happen in 5 minutes')
+          CustomQueueJob.set(wait: 10.minutes).perform_later('this will happen in 10 minutes')
+        end
+      end
+
+      let(:expected_queues) do
+        [
+          {
+            'arguments' => {
+              'x-dead-letter-exchange' => 'activejob',
+              'x-message-ttl' => 300_000, # 5 minute
+              'x-queue-mode' => 'lazy'
+            },
+            'auto_delete' => false,
+            'durable' => true,
+            'exclusive' => false,
+            'name' => 'custom~delayed:300'
+          },
+          {
+            'arguments' => {
+              'x-dead-letter-exchange' => 'activejob',
+              'x-message-ttl' => 600_000, # 10 minutes
+              'x-queue-mode' => 'lazy'
+            },
+            'auto_delete' => false,
+            'durable' => true,
+            'exclusive' => false,
+            'name' => 'custom~delayed:600'
+          }
+        ]
+      end
+
+      it 'is routed to queue with proper TTL and DLX' do
+        subject
+
+        aggregate_failures do
+          expect(rabbitmq_queues).to eq expected_queues
+          expect(rabbitmq_messages('custom~delayed:300').first['payload']).to include('this will happen in 5 minutes')
+          expect(rabbitmq_messages('custom~delayed:600').first['payload']).to include('this will happen in 10 minutes')
+        end
+      end
+    end
+  end
+
+  context 'when ActiveJob has queue name prefix configured' do
+    subject do
+      in_app_process(adapter: :advanced_sneakers, env: { 'ACTIVE_JOB_QUEUE_NAME_PREFIX' => 'awesome', 'ACTIVE_JOB_QUEUE_NAME_DELIMITER' => ':' }) do
+        AdvancedSneakersActiveJob.configure { |c| c.handle_unrouted_messages = true }
+        ApplicationJob.perform_later('Application job')
+        CustomQueueJob.perform_later('Custom queue job')
+      end
+    end
+
+    it 'creates proper queues' do
+      expect do
+        subject
+      end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['awesome:custom', 'awesome:default'])
+    end
+
+    it 'messages are not lost' do
+      subject
+
+      expect(rabbitmq_messages('awesome:default').first['payload']).to include('Application job')
+      expect(rabbitmq_messages('awesome:custom').first['payload']).to include('Custom queue job')
+    end
   end
 end

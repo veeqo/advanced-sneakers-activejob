@@ -33,15 +33,7 @@ module AdvancedSneakersActiveJob
       private
 
       def define_consumer
-        AdvancedSneakersActiveJob.define_consumer(queue_name: queue_name_without_prefix)
-      end
-
-      def queue_name_without_prefix
-        name = queue_name.respond_to?(:call) ? queue_name.call : queue_name
-
-        return name if queue_name_prefix.blank?
-
-        name.to_s.sub([queue_name_prefix, queue_name_delimiter].join, '')
+        AdvancedSneakersActiveJob.define_consumer(queue_name: new.queue_name)
       end
     end
   end

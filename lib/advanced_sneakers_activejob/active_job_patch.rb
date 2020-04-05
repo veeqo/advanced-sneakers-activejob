@@ -33,9 +33,16 @@ module AdvancedSneakersActiveJob
       private
 
       def define_consumer
+        Rails.logger.warn queue_name_without_prefix
+        AdvancedSneakersActiveJob.define_consumer(queue_name: queue_name_without_prefix)
+      end
+
+      def queue_name_without_prefix
         name = queue_name.respond_to?(:call) ? queue_name.call : queue_name
 
-        AdvancedSneakersActiveJob.define_consumer(queue_name: name)
+        return name if queue_name_prefix.blank?
+
+        name.to_s.sub([queue_name_prefix, queue_name_delimiter].join, '')
       end
     end
   end

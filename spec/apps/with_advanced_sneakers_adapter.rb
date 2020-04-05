@@ -11,6 +11,8 @@ require 'advanced/sneakers/activejob'
 class App < Rails::Application
   config.root = __dir__
   config.active_job.queue_adapter = :advanced_sneakers
+  config.active_job.queue_name_prefix = ENV['ACTIVE_JOB_QUEUE_NAME_PREFIX'] if ENV['ACTIVE_JOB_QUEUE_NAME_PREFIX']
+  config.active_job.queue_name_delimiter = ENV['ACTIVE_JOB_QUEUE_NAME_DELIMITER'] if ENV['ACTIVE_JOB_QUEUE_NAME_DELIMITER']
   config.eager_load = true
   config.logger = Logger.new(Rails.root.join('log/rails.log'))
   config.logger.level = :debug

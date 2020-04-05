@@ -62,12 +62,17 @@ describe 'Consumers' do
 
     it 'are defined per queue with prefix ignored in consumer class name' do
       expected_consumers = {
-        'AdvancedSneakersActiveJob::CustomDefaultConsumer' => 'custom:default', # default consumer
         'AdvancedSneakersActiveJob::CustomMailersConsumer' => 'custom:mailers', # action mailer consumer
         'AdvancedSneakersActiveJob::CustomCustomConsumer' => 'custom:custom', # see CustomQueueJob in spec/apps/app/jobs
         'AdvancedSneakersActiveJob::CustomBazConsumer' => 'custom:baz', # baz queue consumer for FooJob and BarJob
         'AdvancedSneakersActiveJob::CustomDynamicConsumer' => 'custom:dynamic' # dynamic queue consumer for DynamicQueueJob
       }
+
+      if ActiveJob.gem_version >= Gem::Version.new('6.0') # https://github.com/rails/rails/pull/34376
+        expected_consumers['AdvancedSneakersActiveJob::CustomDefaultConsumer'] = 'custom:default'
+      else
+        expected_consumers['AdvancedSneakersActiveJob::DefaultConsumer'] = 'default'
+      end
 
       expect(subject.first).to eq(expected_consumers)
     end

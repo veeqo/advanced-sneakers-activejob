@@ -1,3 +1,7 @@
+## Changes Between 0.2.0 and 0.2.2
+
+Cleanup of `puts` and logger mistakenly introduced in previous version
+
 ## Changes Between 0.2.0 and 0.2.1
 
 ### Support for ActiveJob prefix https://github.com/veeqo/advanced-sneakers-activejob/pull/2

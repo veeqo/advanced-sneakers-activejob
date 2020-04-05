@@ -9,7 +9,7 @@ describe AdvancedSneakersActiveJob::WorkersRegistry, '#call' do
   let(:other_class) { Class.new }
 
   before do
-    registry << activejob_class
+    allow(registry).to receive(:activejob_workers).and_return([activejob_class])
     registry << other_class
   end
 

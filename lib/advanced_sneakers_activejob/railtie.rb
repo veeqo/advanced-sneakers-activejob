@@ -12,7 +12,6 @@ module AdvancedSneakersActiveJob
     initializer 'advanced_sneakers_activejob.discover_default_job' do
       ActiveSupport.on_load(:active_job) do
         ActiveJob::Base.include AdvancedSneakersActiveJob::ActiveJobPatch
-        ActiveJob::Base.queue_as # Enforce definition of ActiveJob::Base::Consumer (default queue)
       end
     end
 

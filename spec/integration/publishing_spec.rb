@@ -309,17 +309,32 @@ describe 'Publishing', :rabbitmq do
       end
     end
 
-    it 'creates proper queues' do
-      expect do
+    if ActiveJob.gem_version >= Gem::Version.new('6.0') # https://github.com/rails/rails/pull/34376
+      it 'creates proper queues' do
+        expect do
+          subject
+        end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['awesome:custom', 'awesome:default'])
+      end
+
+      it 'messages are not lost' do
         subject
-      end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['awesome:custom', 'awesome:default'])
-    end
 
-    it 'messages are not lost' do
-      subject
+        expect(rabbitmq_messages('awesome:default').first['payload']).to include('Application job')
+        expect(rabbitmq_messages('awesome:custom').first['payload']).to include('Custom queue job')
+      end
+    else
+      it 'creates proper queues' do
+        expect do
+          subject
+        end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['awesome:custom', 'default'])
+      end
 
-      expect(rabbitmq_messages('awesome:default').first['payload']).to include('Application job')
-      expect(rabbitmq_messages('awesome:custom').first['payload']).to include('Custom queue job')
+      it 'messages are not lost' do
+        subject
+
+        expect(rabbitmq_messages('default').first['payload']).to include('Application job')
+        expect(rabbitmq_messages('awesome:custom').first['payload']).to include('Custom queue job')
+      end
     end
   end
 end

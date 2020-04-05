@@ -4,7 +4,7 @@ module AdvancedSneakersActiveJob
   # Sneakers uses Sneakers::Worker::Classes array to track all workers.
   # WorkersRegistry mocks original array to track ActiveJob workers separately.
   class WorkersRegistry
-    attr_reader :sneakers_workers, :activejob_workers
+    attr_reader :sneakers_workers
 
     delegate :activejob_workers_strategy, to: :'AdvancedSneakersActiveJob.config'
 
@@ -17,7 +17,7 @@ module AdvancedSneakersActiveJob
 
     def <<(worker)
       if worker <= ActiveJob::QueueAdapters::AdvancedSneakersAdapter::JobWrapper
-        activejob_workers << worker
+        @activejob_workers << worker
       else
         sneakers_workers << worker
       end
@@ -36,12 +36,30 @@ module AdvancedSneakersActiveJob
       end
     end
 
-    # For cleaner output on inspecting Sneakers::Worker::Classes in console.
-    def inspect
+    def to_hash
       {
         sneakers_workers: sneakers_workers,
         activejob_workers: activejob_workers
       }
+    end
+
+    alias to_h to_hash
+
+    # For cleaner output on inspecting Sneakers::Worker::Classes in console.
+    alias inspect to_hash
+
+    def activejob_workers
+      define_active_job_consumers
+
+      @activejob_workers
+    end
+
+    private
+
+    def define_active_job_consumers
+      ([ActiveJob::Base] + ActiveJob::Base.descendants).each do |worker|
+        AdvancedSneakersActiveJob.define_consumer(queue_name: worker.new.queue_name)
+      end
     end
   end
 end

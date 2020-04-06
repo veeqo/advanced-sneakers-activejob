@@ -77,4 +77,56 @@ describe 'Consumers' do
       expect(subject.first).to eq(expected_consumers)
     end
   end
+
+  if ActiveJob.gem_version >= Gem::Version.new('5.0')
+    context 'when there are ActiveJob classes with custom queue adapter' do
+      subject do
+        in_app_process(adapter: :advanced_sneakers) do
+          class FooJob < ApplicationJob
+            self.queue_adapter = :async
+
+            queue_as :bar
+          end
+
+          AdvancedSneakersActiveJob.configure { |c| c.activejob_workers_strategy = :only }
+
+          Sneakers::Worker::Classes.call.map { |consumer| [consumer.name, consumer.queue_name] }.to_h
+        end
+      end
+
+      it 'are defined for queue from matching adapter only' do
+        expected_consumers = {
+          'AdvancedSneakersActiveJob::DefaultConsumer' => 'default', # default consumer
+          'AdvancedSneakersActiveJob::MailersConsumer' => 'mailers', # action mailer consumer
+          'AdvancedSneakersActiveJob::CustomConsumer' => 'custom' # see CustomQueueJob in spec/apps/app/jobs
+        }
+
+        expect(subject.first).to eq(expected_consumers)
+      end
+    end
+
+    context 'when advanced_sneakers is set as custom adapter' do
+      subject do
+        in_app_process(adapter: :inline) do
+          class FooJob < ApplicationJob
+            self.queue_adapter = :advanced_sneakers
+
+            queue_as :bar
+          end
+
+          AdvancedSneakersActiveJob.configure { |c| c.activejob_workers_strategy = :only }
+
+          Sneakers::Worker::Classes.call.map { |consumer| [consumer.name, consumer.queue_name] }.to_h
+        end
+      end
+
+      it 'are defined for queue from matching adapter only' do
+        expected_consumers = {
+          'AdvancedSneakersActiveJob::BarConsumer' => 'bar' # bar queue consumer for FooJob
+        }
+
+        expect(subject.first).to eq(expected_consumers)
+      end
+    end
+  end
 end

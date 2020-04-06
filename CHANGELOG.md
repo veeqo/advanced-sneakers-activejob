@@ -1,4 +1,9 @@
-## Changes Between 0.2.0 and 0.2.2
+## Changes Between 0.2.2 and 0.2.3
+
+### Refactored support for ActiveJob prefix https://github.com/veeqo/advanced-sneakers-activejob/pull/3
+### Support for custom adapter per job https://github.com/veeqo/advanced-sneakers-activejob/pull/4
+
+## Changes Between 0.2.1 and 0.2.2
 
 Cleanup of `puts` and logger mistakenly introduced in previous version
 

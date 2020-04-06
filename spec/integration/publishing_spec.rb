@@ -337,4 +337,52 @@ describe 'Publishing', :rabbitmq do
       end
     end
   end
+
+  if ActiveJob.gem_version >= Gem::Version.new('5.0')
+    context 'when there are ActiveJob classes with custom queue adapter' do
+      subject do
+        in_app_process(adapter: :advanced_sneakers) do
+          AdvancedSneakersActiveJob.configure { |c| c.handle_unrouted_messages = true }
+
+          class FooJob < ApplicationJob
+            self.queue_adapter = :async
+
+            queue_as :bar
+          end
+
+          FooJob.perform_later('Foo job')
+          CustomQueueJob.perform_later('Custom queue job')
+        end
+      end
+
+      it 'creates queues for jobs with matching adapter' do
+        expect do
+          subject
+        end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['custom']) # no "bar"
+      end
+    end
+
+    context 'when advanced_sneakers is set as custom adapter' do
+      subject do
+        in_app_process(adapter: :inline) do
+          AdvancedSneakersActiveJob.configure { |c| c.handle_unrouted_messages = true }
+
+          class FooJob < ApplicationJob
+            self.queue_adapter = :advanced_sneakers
+
+            queue_as :bar
+          end
+
+          FooJob.perform_later('Foo job')
+          CustomQueueJob.perform_later('Custom queue job')
+        end
+      end
+
+      it 'creates queues for jobs with matching adapter' do
+        expect do
+          subject
+        end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['bar']) # no "custom"
+      end
+    end
+  end
 end

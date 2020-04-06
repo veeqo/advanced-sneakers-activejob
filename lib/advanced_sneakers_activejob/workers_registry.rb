@@ -57,8 +57,15 @@ module AdvancedSneakersActiveJob
     private
 
     def define_active_job_consumers
-      ([ActiveJob::Base] + ActiveJob::Base.descendants).each do |worker|
+      active_job_classes_with_matching_adapter.each do |worker|
         AdvancedSneakersActiveJob.define_consumer(queue_name: worker.new.queue_name)
+      end
+    end
+
+    def active_job_classes_with_matching_adapter
+      ([ActiveJob::Base] + ActiveJob::Base.descendants).select do |klass|
+        klass.queue_adapter == ::ActiveJob::QueueAdapters::AdvancedSneakersAdapter ||
+          klass.queue_adapter.is_a?(::ActiveJob::QueueAdapters::AdvancedSneakersAdapter)
       end
     end
   end

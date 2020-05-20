@@ -5,11 +5,10 @@ module AdvancedSneakersActiveJob
   class Handler < Sneakers::Handlers::Oneshot
     def error(delivery_info, properties, message, error)
       params = properties.to_h
-      params[:headers] = patch_headers(params[:headers], delivery_info, error)
+      params[:headers] = patch_headers(params[:headers] || {}, delivery_info, error)
       params[:routing_key] = delivery_info.routing_key
-      params[:delay] = calculate_delay(params[:headers], delivery_info)
 
-      AdvancedSneakersActiveJob.publisher.publish_delayed(message, params)
+      AdvancedSneakersActiveJob.delayed_publisher.publish(message, params)
 
       acknowledge(delivery_info, properties, message)
     end
@@ -23,6 +22,7 @@ module AdvancedSneakersActiveJob
 
       track_error_in_headers(headers, error)
       track_death_in_headers(headers, queue, exchange, routing_key)
+      set_delay_in_headers(headers, delivery_info)
 
       headers
     end
@@ -39,6 +39,10 @@ module AdvancedSneakersActiveJob
       else
         headers['x-death'] << build_death_row(queue, exchange, routing_key)
       end
+    end
+
+    def set_delay_in_headers(headers, delivery_info)
+      headers['delay'] = calculate_delay(headers, delivery_info)
     end
 
     def build_death_row(queue, exchange, routing_key)

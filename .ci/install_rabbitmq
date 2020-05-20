@@ -11,7 +11,7 @@ deb https://dl.bintray.com/rabbitmq/debian xenial main
 EOF
 
 sudo apt-get update -y
-sudo apt-get install -y rabbitmq-server
+sudo apt-get install -y --allow-unauthenticated rabbitmq-server
 
 sudo systemctl start rabbitmq-server
 sudo rabbitmq-plugins enable rabbitmq_management

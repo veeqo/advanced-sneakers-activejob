@@ -26,7 +26,10 @@ module ActiveJob
           delay = AdvancedSneakersActiveJob.config.delay_proc.call(timestamp).to_i
 
           if delay.positive?
-            AdvancedSneakersActiveJob.publisher.publish_delayed(*publish_params(job).tap { |params| params.last[:delay] = delay })
+            message, options = publish_params(job)
+            options[:headers] = { 'delay' => delay.to_i } # do not use x- prefix because headers exchanges ignore such headers
+
+            AdvancedSneakersActiveJob.delayed_publisher.publish(message, options)
           else
             enqueue(job)
           end
@@ -38,7 +41,7 @@ module ActiveJob
           @monitor.synchronize do
             [
               Sneakers::ContentType.serialize(job.serialize, AdvancedSneakersActiveJob::CONTENT_TYPE),
-              build_publish_params(job)
+              build_publish_params(job).merge(content_type: AdvancedSneakersActiveJob::CONTENT_TYPE)
             ]
           end
         end

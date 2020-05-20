@@ -3,17 +3,17 @@ dist: xenial
 language: ruby
 cache: bundler
 rvm:
-  - 2.4.9
-  - 2.5.7
-  - 2.6.5
+  - 2.5.8
+  - 2.6.6
+  - 2.7.1
 env:
   - RAILS_VERSION="~> 4.2.11"
   - RAILS_VERSION="~> 5.2.4"
   - RAILS_VERSION="~> 6.0.2"
 jobs:
   exclude:
-    - rvm: 2.4.9
-      env: RAILS_VERSION="~> 6.0.2"
+    - rvm: 2.7.1
+      env: RAILS_VERSION="~> 4.2.11"
 
 before_install: gem install bundler -v 1.17.3
 before_script:

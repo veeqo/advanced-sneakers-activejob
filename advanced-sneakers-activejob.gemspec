@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activejob', '>= 4.2'
+  spec.add_dependency 'bunny-publisher', '~> 0.1'
   spec.add_dependency 'sneakers', '~> 2.7'
 
   spec.add_development_dependency 'bundler'

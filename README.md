@@ -49,7 +49,7 @@ If message is published before routing has been configured (e.g. by consumer), i
 
 There is a setting `handle_unrouted_messages` in [configuration](#configuration) to disable this behavior. If it is disabled, publisher will only log unrouted messages.
 
-Take into accout that **this process is asynchronous**. It means that in case of network failures or process exit unrouted messages could be lost. The adapter tries to postpone application exit up to 30 seconds in case if there are unrouted messages, but it does not provide any guarantees.
+Take into accout that **this process is asynchronous**. It means that in case of network failures or process exit unrouted messages could be lost. The adapter tries to postpone application exit up to 5 seconds in case if there are unrouted messages, but it does not provide any guarantees.
 
 **Delayed messages are not handled!** If job is delayed `GuestsCleanupJob.set(wait: 1.week).perform_later(guest)` and there is no proper routing defined at the moment of job execution, it would be lost.
 
@@ -152,12 +152,19 @@ AdvancedSneakersActiveJob.configure do |config|
 
   # Custom sneakers configuration for ActiveJob publisher & runner
   config.sneakers = {
+    connection: Bunny.new('CUSTOM_URL', with: { other: 'options' }),
     exchange: 'activejob',
     handler: AdvancedSneakersActiveJob::Handler
   }
 
   # Define custom delay for retries, but remember - each unique delay leads to new queue on RabbitMQ side
   config.retry_delay_proc = ->(count) { AdvancedSneakersActiveJob::EXPONENTIAL_BACKOFF[count] }
+
+  # Connection for publisher (fallbacks to connection of consumers)
+  config.publish_connection = Bunny.new('CUSTOM_URL', with: { other: 'options' })
+
+  # Unrouted messages republish requires extra connection and will try to "clone" publish_connection unless it is provided
+  config.republish_connection = Bunny.new('CUSTOM_URL', with: { other: 'options' })
 end
 ```
 
@@ -168,3 +175,5 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/veeqo/
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+## Sponsored by [Veeqo](https://veeqo.com/)

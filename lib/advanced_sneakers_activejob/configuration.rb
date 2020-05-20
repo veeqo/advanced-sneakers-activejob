@@ -17,6 +17,9 @@ module AdvancedSneakersActiveJob
     config_accessor(:delayed_queue_prefix) { 'delayed' }
     config_accessor(:retry_delay_proc) { ->(count) { AdvancedSneakersActiveJob::EXPONENTIAL_BACKOFF[count] } } # seconds
 
+    config_accessor(:publish_connection)
+    config_accessor(:republish_connection)
+
     def sneakers
       custom_config = DEFAULT_SNEAKERS_CONFIG.deep_merge(config.sneakers || {})
 
@@ -29,6 +32,10 @@ module AdvancedSneakersActiveJob
 
     def sneakers=(custom)
       config.sneakers = custom
+    end
+
+    def publisher_config
+      sneakers.merge(publish_connection: publish_connection, republish_connection: republish_connection)
     end
   end
 end

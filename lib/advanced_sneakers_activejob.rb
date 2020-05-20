@@ -2,6 +2,7 @@
 
 require 'active_support'
 require 'active_support/core_ext'
+require 'bunny_publisher'
 
 require 'sneakers'
 require 'advanced_sneakers_activejob/workers_registry'
@@ -15,6 +16,7 @@ require 'advanced_sneakers_activejob/handler'
 require 'advanced_sneakers_activejob/configuration'
 require 'advanced_sneakers_activejob/errors'
 require 'advanced_sneakers_activejob/publisher'
+require 'advanced_sneakers_activejob/delayed_publisher'
 require 'advanced_sneakers_activejob/active_job_patch'
 require 'advanced_sneakers_activejob/railtie' if defined?(::Rails::Railtie)
 require 'active_job/queue_adapters/advanced_sneakers_adapter'
@@ -38,13 +40,17 @@ module AdvancedSneakersActiveJob
       klass = Class.new(ActiveJob::QueueAdapters::AdvancedSneakersAdapter::JobWrapper)
       const_set(name, klass)
       klass.include Sneakers::Worker
-      klass.from_queue(queue_name, AdvancedSneakersActiveJob.config.sneakers)
+      klass.from_queue(queue_name, config.sneakers)
 
       klass
     end
 
     def publisher
-      @publisher ||= AdvancedSneakersActiveJob::Publisher.new
+      @publisher ||= AdvancedSneakersActiveJob::Publisher.new(config.publisher_config)
+    end
+
+    def delayed_publisher
+      @delayed_publisher ||= AdvancedSneakersActiveJob::DelayedPublisher.new(config.publisher_config)
     end
 
     # Based on ActiveSupport::Inflector#parameterize

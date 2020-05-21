@@ -1,3 +1,9 @@
+## Changes Between 0.2.3 and 0.3
+
+This release does not change the observed behavior, but replaces the publisher with completely new implementation.
+
+### Reusable parts of publisher are extracted to [bunny-publisher](https://github.com/veeqo/bunny-publisher)
+
 ## Changes Between 0.2.2 and 0.2.3
 
 ### Refactored support for ActiveJob prefix https://github.com/veeqo/advanced-sneakers-activejob/pull/3

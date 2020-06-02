@@ -54,6 +54,18 @@ module AdvancedSneakersActiveJob
       @activejob_workers
     end
 
+    def method_missing(method_name, *args, &block)
+      if call.respond_to?(method_name)
+        call.send(method_name, *args, &block)
+      else
+        super
+      end
+    end
+
+    def respond_to_missing?(method_name, include_private = false)
+      call.respond_to?(method_name) || super
+    end
+
     private
 
     def define_active_job_consumers

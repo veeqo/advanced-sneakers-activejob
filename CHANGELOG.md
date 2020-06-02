@@ -1,4 +1,8 @@
-## Changes Between 0.2.3 and 0.3
+## Changes Between 0.3.0 and 0.3.1 (unreleased)
+
+### Restore Sneakers::Worker::Classes methods https://github.com/veeqo/advanced-sneakers-activejob/pull/6
+
+## Changes Between 0.2.3 and 0.3.0
 
 This release does not change the observed behavior, but replaces the publisher with completely new implementation.
 

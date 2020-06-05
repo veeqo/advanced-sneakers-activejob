@@ -66,13 +66,13 @@ module AdvancedSneakersActiveJob
       call.respond_to?(method_name) || super
     end
 
-    private
-
     def define_active_job_consumers
       active_job_classes_with_matching_adapter.each do |worker|
         AdvancedSneakersActiveJob.define_consumer(queue_name: worker.new.queue_name)
       end
     end
+
+    private
 
     def active_job_classes_with_matching_adapter
       ([ActiveJob::Base] + ActiveJob::Base.descendants).select do |klass|

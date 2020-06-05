@@ -73,4 +73,27 @@ describe 'rake sneakers:run', :rabbitmq do
                   to_exclude: "Performing 'sneakers worker data'"
     end
   end
+
+  context 'when WORKERS variable is set' do
+    it 'processes jobs for given workers only' do
+      in_app_process(adapter: :advanced_sneakers) do
+        ENV['WORKERS'] = 'AdvancedSneakersActiveJob::MailersConsumer'
+
+        require 'rake'
+        require 'sneakers/tasks'
+        Rake::Task['sneakers:run'].invoke
+      end
+
+      publish_messages
+
+      expect_logs name: 'rails',
+                  to_include: [
+                    'Performing ActionMailer::DeliveryJob'
+                  ],
+                  to_exclude: [
+                    "Performing 'activejob worker data'",
+                    "Performing 'sneakers worker data'"
+                  ]
+    end
+  end
 end

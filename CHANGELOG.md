@@ -1,3 +1,19 @@
+## Changes Between 0.3.1 and 0.3.2
+
+### [Add ability to run specified ActiveJob queues consumers](https://github.com/veeqo/advanced-sneakers-activejob/pull/8)
+
+Sneakers allows to specify consumer classes to run:
+
+```sh
+WORKERS=MyConsumer rake sneakers:run
+```
+
+Now it works for ActiveJob queues consumers as well:
+
+```sh
+WORKERS=AdvancedSneakersActiveJob::MailersConsumer rake sneakers:run
+```
+
 ## Changes Between 0.3.0 and 0.3.1
 
 ### [Restore Sneakers::Worker::Classes methods](https://github.com/veeqo/advanced-sneakers-activejob/pull/6)

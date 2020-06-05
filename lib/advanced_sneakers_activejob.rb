@@ -68,5 +68,11 @@ module AdvancedSneakersActiveJob
 
       [parameterized_string, 'consumer'].join('_').classify
     end
+
+    def const_missing(name)
+      Sneakers::Worker::Classes.define_active_job_consumers
+
+      constants.include?(name) ? const_get(name) : super
+    end
   end
 end

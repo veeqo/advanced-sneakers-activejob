@@ -1,3 +1,13 @@
+## Changes Between 0.3.2 and 0.3.3
+
+### [Add ability to run ActiveJob consumers by queues](https://github.com/veeqo/advanced-sneakers-activejob/pull/9)
+
+Works with `sneakers:active_job` task only!
+
+```sh
+rake sneakers:active_job QUEUES=mailers,default
+```
+
 ## Changes Between 0.3.1 and 0.3.2
 
 ### [Add ability to run specified ActiveJob queues consumers](https://github.com/veeqo/advanced-sneakers-activejob/pull/8)

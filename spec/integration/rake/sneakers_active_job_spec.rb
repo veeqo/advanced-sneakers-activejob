@@ -11,20 +11,43 @@ describe 'rake sneakers:active_job', :rabbitmq do
     end
   end
 
-  it 'processes jobs for ActiveJob workers only' do
-    in_app_process(adapter: :advanced_sneakers) do
-      require 'rake'
-      require 'advanced_sneakers_activejob/tasks'
-      Rake::Task['sneakers:active_job'].invoke
+  context 'when QUEUES variable is unset' do
+    it 'processes jobs for all ActiveJob workers' do
+      in_app_process(adapter: :advanced_sneakers) do
+        require 'rake'
+        require 'advanced_sneakers_activejob/tasks'
+        Rake::Task['sneakers:active_job'].invoke
+      end
+
+      publish_messages
+
+      expect_logs name: 'rails',
+                  to_include: [
+                    "Performing 'activejob worker data'",
+                    'Performing ActionMailer::DeliveryJob'
+                  ],
+                  to_exclude: "Performing 'sneakers worker data'"
     end
+  end
 
-    publish_messages
+  context 'when QUEUES variable is set' do
+    it 'processes jobs for matching ActiveJob workers only' do
+      in_app_process(adapter: :advanced_sneakers) do
+        ENV['QUEUES'] = 'mailers'
 
-    expect_logs name: 'rails',
-                to_include: [
-                  "Performing 'activejob worker data'",
-                  'Performing ActionMailer::DeliveryJob'
-                ],
-                to_exclude: "Performing 'sneakers worker data'"
+        require 'rake'
+        require 'advanced_sneakers_activejob/tasks'
+        Rake::Task['sneakers:active_job'].invoke
+      end
+
+      publish_messages
+
+      expect_logs name: 'rails',
+                  to_include: 'Performing ActionMailer::DeliveryJob',
+                  to_exclude: [
+                    "Performing 'activejob worker data'",
+                    "Performing 'sneakers worker data'"
+                  ]
+    end
   end
 end

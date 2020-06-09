@@ -34,9 +34,14 @@ Or install it yourself as:
 config.active_job.queue_adapter = :advanced_sneakers
 ```
 
-Run worker
+Run worker for all queues of ActiveJob
 ```sh
 rake sneakers:active_job
+```
+
+Run worker for picked queues of ActiveJob
+```sh
+rake sneakers:active_job QUEUES=mailers,foo,bar
 ```
 
 ## Unrouted messages

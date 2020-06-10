@@ -41,7 +41,13 @@ rake sneakers:active_job
 
 Run worker for picked queues of ActiveJob
 ```sh
-rake sneakers:active_job QUEUES=mailers,foo,bar
+QUEUES=mailers,foo,bar rake sneakers:active_job
+```
+
+Wildcards are supported for queues names with "words" (separator is `.`). Algorithm is similar to the way the [topic exchange matches routing keys](https://www.rabbitmq.com/tutorials/tutorial-five-python.html). `*` (star) substitutes for exactly one word. `#` (hash) substitutes for zero or more words
+
+```sh
+QUEUES=mailers,index.*,telemetery.# rake sneakers:active_job
 ```
 
 ## Unrouted messages

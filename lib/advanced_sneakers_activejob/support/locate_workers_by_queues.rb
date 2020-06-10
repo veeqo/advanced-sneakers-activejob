@@ -13,7 +13,7 @@ module AdvancedSneakersActiveJob
         detect_workers_for_queues!
         ensure_all_workers_found!
 
-        @workers
+        @workers.uniq
       end
 
       private
@@ -30,14 +30,23 @@ module AdvancedSneakersActiveJob
 
       def detect_workers_for_queues!
         @queues.each do |queue|
-          worker = all_workers.detect { |klass| klass.queue_name == queue }
+          matching_workers = all_workers.select { |klass| klass.queue_name.match?(queue_regex(queue)) }
 
-          if worker
-            @workers << worker
+          if matching_workers.any?
+            @workers += matching_workers
           else
             @queues_without_workers << queue
           end
         end
+      end
+
+      # https://www.rabbitmq.com/tutorials/tutorial-five-python.html
+      def queue_regex(queue)
+        regex = Regexp.escape(queue)
+                      .gsub(/\A\\\*|(\.)\\\*/, '\1[^\.]+') # "*" (star) substitutes for exactly one word
+                      .sub('\.\#', '(\.[^\.]+)*') # "#" (hash) substitutes for zero or more words
+
+        Regexp.new(['\A', regex, '\z'].join)
       end
     end
   end

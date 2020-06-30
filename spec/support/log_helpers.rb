@@ -41,7 +41,7 @@ module LogHelpers
     filtered_text = text
 
     {
-      job_id: /\(Job ID[^\)]+\) /,
+      job_id: /\(Job ID[^)]+\) /,
       created_at: /enqueued at [^ ]+ /
     }.each do |filter, regex|
       filtered_text.gsub!(regex, '') if filters.include?(filter)

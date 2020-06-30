@@ -1,5 +1,12 @@
+AllCops:
+  NewCops: enable
+
 Layout/LineLength:
   Max: 140
+  Exclude:
+    - spec/**/*
+
+Lint/SuppressedException:
   Exclude:
     - spec/**/*
 
@@ -10,6 +17,10 @@ Metrics/BlockLength:
   Exclude:
     - advanced-sneakers-activejob.gemspec
     - spec/**/*
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - spec/support/log_helpers.rb
 
 Metrics/MethodLength:
   Exclude:
@@ -24,10 +35,6 @@ Security/Eval:
     - spec/apps/**/*
 
 Metrics/AbcSize:
-  Exclude:
-    - spec/**/*
-
-Lint/SuppressedException:
   Exclude:
     - spec/**/*
 

@@ -1,4 +1,4 @@
-## Changes Between 0.3.4 and 0.3.5 (unreleased)
+## Changes Between 0.3.4 and 0.3.5
 
 [Fixed NoMethodError on Rails.application.eager_load! in Rails initializer](https://github.com/veeqo/advanced-sneakers-activejob/pull/11)
 

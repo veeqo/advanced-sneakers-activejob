@@ -21,6 +21,14 @@ require 'advanced_sneakers_activejob/active_job_patch'
 require 'advanced_sneakers_activejob/railtie' if defined?(::Rails::Railtie)
 require 'active_job/queue_adapters/advanced_sneakers_adapter'
 
+ActiveSupport.on_load(:active_job) do
+  ActiveJob::Base.include AdvancedSneakersActiveJob::ActiveJobPatch
+end
+
+ActiveSupport.on_load(:action_mailer) do
+  require 'action_mailer/delivery_job' # Enforce definition of ActionMailer::DeliveryJob::Consumer
+end
+
 # Advanced Sneakers adapter for ActiveJob
 module AdvancedSneakersActiveJob
   class << self

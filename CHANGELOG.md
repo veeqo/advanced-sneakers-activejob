@@ -1,3 +1,11 @@
+## Changes Between 0.3.4 and 0.3.5 (unreleased)
+
+[Fixed NoMethodError on Rails.application.eager_load! in Rails initializer](https://github.com/veeqo/advanced-sneakers-activejob/pull/11)
+
+```
+NoMethodError: undefined method `message_options' for MyJob:Class
+```
+
 ## Changes Between 0.3.3 and 0.3.4
 
 ### [Support for wildcards to run ActiveJob consumers by queues](https://github.com/veeqo/advanced-sneakers-activejob/pull/10)

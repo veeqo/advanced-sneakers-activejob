@@ -30,10 +30,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bunny-publisher', '~> 0.1'
   spec.add_dependency 'sneakers', '~> 2.7'
 
+  spec.add_development_dependency 'appraisal', '~> 2.3.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'rabbitmq_http_api_client', '~> 1.13'
-  spec.add_development_dependency 'rails', '>= 4.2'
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'rspec', '~> 3.0'
 end

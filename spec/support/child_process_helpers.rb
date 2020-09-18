@@ -47,8 +47,8 @@ module ChildProcessHelpers
     Process.spawn(env, "ruby -r #{app_path}.rb -e 'Marshal.dump(eval(STDIN.read), STDOUT)'", in: read, out: write, err: err)
   end
 
-  def start_sneakers_consumers(*args)
-    in_app_process(*args) do
+  def start_sneakers_consumers(**args)
+    in_app_process(**args) do
       require 'rake'
       require 'sneakers/tasks'
       Rake::Task['sneakers:run'].invoke

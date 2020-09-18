@@ -54,11 +54,11 @@ module AdvancedSneakersActiveJob
     end
 
     def publisher
-      @publisher ||= AdvancedSneakersActiveJob::Publisher.new(config.publisher_config)
+      @publisher ||= AdvancedSneakersActiveJob::Publisher.new(**config.publisher_config)
     end
 
     def delayed_publisher
-      @delayed_publisher ||= AdvancedSneakersActiveJob::DelayedPublisher.new(config.publisher_config)
+      @delayed_publisher ||= AdvancedSneakersActiveJob::DelayedPublisher.new(**config.publisher_config)
     end
 
     # Based on ActiveSupport::Inflector#parameterize

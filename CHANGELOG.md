@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.3.5...HEAD)
+## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.3.6...HEAD)
+
+
+## [0.3.6](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.3.5...v0.3.6) - 2020-09-18
 
 ### Changed
 - [#12](https://github.com/veeqo/advanced-sneakers-activejob/pull/12) Refactor changelog to comply with Keep a Changelog

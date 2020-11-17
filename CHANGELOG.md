@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.3.6...HEAD)
+## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.4.0...HEAD)
+
+
+## [0.4.0](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.3.6...v0.4.0) - 2020-11-17
 
 ### Added
 - [#15](https://github.com/veeqo/advanced-sneakers-activejob/pull/15) Add ability to set AMQP message options per job

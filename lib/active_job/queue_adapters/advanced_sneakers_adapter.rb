@@ -47,17 +47,25 @@ module ActiveJob
         end
 
         def build_publish_params(job)
-          params = job.class.publish_options.dup || {}
-
-          params.each do |key, value|
-            params[key] = value.call(job) if value.respond_to?(:call)
-          end
+          params = merged_publish_options(job)
 
           unless params.key?(:routing_key)
             params[:routing_key] = job.queue_name.respond_to?(:call) ? job.queue_name.call : job.queue_name
           end
 
           params
+        end
+
+        def merged_publish_options(job)
+          publish_options = job.class.publish_options.deep_dup || {}
+
+          publish_options.each do |key, value|
+            publish_options[key] = value.call(job) if value.respond_to?(:call)
+          end
+
+          publish_options.deep_merge!(job.publish_options) if job.publish_options.present?
+
+          publish_options
         end
       end
 

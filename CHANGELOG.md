@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.3.6...HEAD)
 
+### Added
+- [#15](https://github.com/veeqo/advanced-sneakers-activejob/pull/15) Add ability to set AMQP message options per job
+
 
 ## [0.3.6](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.3.5...v0.3.6) - 2020-09-18
 

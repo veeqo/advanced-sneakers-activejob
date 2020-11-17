@@ -66,7 +66,7 @@ Take into accout that **this process is asynchronous**. It means that in case of
 
 ## Custom message options
 
-Advanced sneakers adapter allows to set custom message options (e.g. [routing keys](https://www.rabbitmq.com/tutorials/tutorial-four-ruby.html)).
+Advanced sneakers adapter allows to set [custom message options](http://reference.rubybunny.info/Bunny/Exchange.html#publish-instance_method) (e.g. [routing keys](https://www.rabbitmq.com/tutorials/tutorial-four-ruby.html)) on class-level.
 
 ```ruby
 class MyJob < ActiveJob::Base
@@ -96,6 +96,14 @@ class MyJob < ActiveJob::Base
 end
 ```
 
+And also supports custom message options per job
+```ruby
+MyJob.set(priority: 1, headers: { 'foo' => 'bar' }).perform_later('baz')
+```
+
+Read more about message properties:
+- https://www.rabbitmq.com/publishers.html#message-properties
+- http://reference.rubybunny.info/Bunny/Exchange.html#publish-instance_method
 
 Take into accout that **custom message options are used for publishing only**.
 

@@ -5,24 +5,51 @@ describe 'Publishing', :rabbitmq do
 
   context 'when job has no message options configured' do
     context 'when handle_unrouted_messages is on' do
-      subject do
-        in_app_process(adapter: :advanced_sneakers) do
-          AdvancedSneakersActiveJob.configure { |c| c.handle_unrouted_messages = true }
-          CustomQueueJob.perform_later("I don't want this message to be lost")
+      context 'when publishing job without message options set' do
+        subject do
+          in_app_process(adapter: :advanced_sneakers) do
+            AdvancedSneakersActiveJob.configure { |c| c.handle_unrouted_messages = true }
+            CustomQueueJob.perform_later("I don't want this message to be lost")
+          end
+        end
+
+        it 'creates proper queue' do
+          expect do
+            subject
+          end.to change { rabbitmq_queues(columns: [:name]) }.from([]).to([{ 'name' => 'custom' }])
+        end
+
+        it 'message is not lost' do
+          subject
+          message = rabbitmq_messages('custom').first
+
+          expect(message['payload']).to include("I don't want this message to be lost")
         end
       end
 
-      it 'creates proper queue' do
-        expect do
+      context 'when publishing job with message options set' do
+        subject do
+          in_app_process(adapter: :advanced_sneakers) do
+            AdvancedSneakersActiveJob.configure { |c| c.handle_unrouted_messages = true }
+            CustomQueueJob.set(queue: 'foo', message_id: '123', priority: 1, headers: { 'baz' => 'qux' }).perform_later('quux')
+          end
+        end
+
+        it 'creates proper queue' do
+          expect do
+            subject
+          end.to change { rabbitmq_queues(columns: [:name]) }.from([]).to([{ 'name' => 'foo' }])
+        end
+
+        it 'message is not lost and has all custom options' do
           subject
-        end.to change { rabbitmq_queues(columns: [:name]) }.from([]).to([{ 'name' => 'custom' }])
-      end
+          message = rabbitmq_messages('foo').first
 
-      it 'message is not lost' do
-        subject
-        message = rabbitmq_messages('custom').first
-
-        expect(message['payload']).to include("I don't want this message to be lost")
+          expect(message.properties.message_id).to eq('123')
+          expect(message.properties.priority).to eq(1)
+          expect(message.properties.headers).to eq({ 'baz' => 'qux' })
+          expect(message.payload).to include('quux')
+        end
       end
     end
 
@@ -122,7 +149,7 @@ describe 'Publishing', :rabbitmq do
           class JobWithRoutingKey < ApplicationJob
             queue_as :foobar
 
-            message_options headers: { 'foo' => 'bar' }
+            message_options priority: 2, headers: { 'foo' => 'bar' }
           end
 
           JobWithRoutingKey.perform_later('whatever')
@@ -139,7 +166,33 @@ describe 'Publishing', :rabbitmq do
       it 'respects custom message options' do
         subject
 
-        expect(rabbitmq_messages('foobar').first.properties.headers).to eq('foo' => 'bar')
+        message = rabbitmq_messages('foobar').first
+
+        expect(message.properties.priority).to eq(2)
+        expect(message.properties.headers).to eq('foo' => 'bar')
+      end
+    end
+
+    context 'when publishing job with message options set' do
+      subject do
+        in_app_process(adapter: :advanced_sneakers) do
+          class JobWithRoutingKey < ApplicationJob
+            queue_as :foobar
+
+            message_options priority: 2, headers: { 'foo' => 'bar' }
+          end
+
+          JobWithRoutingKey.set(priority: 1, headers: { 'baz' => 'qux' }).perform_later('whatever')
+        end
+      end
+
+      it 'merges class-level message_options with ad-hoc options' do
+        subject
+
+        message = rabbitmq_messages('foobar').first
+
+        expect(message.properties.priority).to eq(1)
+        expect(message.properties.headers).to eq('foo' => 'bar', 'baz' => 'qux')
       end
     end
   end

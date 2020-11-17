@@ -12,6 +12,12 @@ Lint/SuppressedException:
   Exclude:
     - spec/**/*
 
+Lint/ConstantDefinitionInBlock:
+  Enabled: false
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
 Metrics/ClassLength:
   Enabled: false
 

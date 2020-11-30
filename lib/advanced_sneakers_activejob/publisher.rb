@@ -14,9 +14,9 @@ module AdvancedSneakersActiveJob
 
     private
 
-    def log_message(publisher, message, options = {})
+    def log_message
       logger.debug do
-        "Publishing <#{message}> to [#{publisher.exchange.name}] with routing_key [#{options[:routing_key]}]"
+        "Publishing <#{message}> to [#{@exchange_name}] with routing_key [#{message_options[:routing_key]}]"
       end
     end
 

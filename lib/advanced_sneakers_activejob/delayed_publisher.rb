@@ -17,24 +17,20 @@ module AdvancedSneakersActiveJob
     attr_reader :dlx_exchange_name
 
     def initialize(exchange:, **options)
-      super(options.merge(exchange: [exchange, 'delayed'].join('-'), exchange_options: { type: 'headers', durable: true }))
+      super(**options.merge(exchange: [exchange, 'delayed'].join('-'), exchange_options: { type: 'headers', durable: true }))
 
       @dlx_exchange_name = exchange
     end
 
     private
 
-    def log_message(publisher, message, options = {})
+    def log_message
       logger.debug do
-        delay = options.dig(:headers, 'delay')
-
-        "Publishing <#{message}> to [#{publisher.exchange.name}] with routing_key [#{options[:routing_key]}] and delay [#{delay}]"
+        "Publishing <#{message}> to [#{@exchange_name}] with routing_key [#{message_options[:routing_key]}] and delay [#{delay}]"
       end
     end
 
-    def declare_republish_queue(_return_info, properties, _message)
-      delay = properties.headers.fetch('delay')
-
+    def declare_republish_queue
       queue_name = delayed_queue_name(delay: delay)
 
       queue_arguments = {
@@ -45,11 +41,15 @@ module AdvancedSneakersActiveJob
 
       logger.debug { "Creating delayed queue [#{queue_name}]" }
 
-      republish_channel.queue(queue_name, durable: true, arguments: queue_arguments)
+      channel.queue(queue_name, durable: true, arguments: queue_arguments)
     end
 
-    def declare_republish_queue_binding(queue, _return_info, properties, _message)
-      queue.bind(republish_exchange, arguments: { delay: properties.headers.fetch('delay') })
+    def delay
+      message_options.dig(:headers, 'delay')
+    end
+
+    def declare_republish_queue_binding(queue)
+      queue.bind(exchange, arguments: { delay: delay })
     end
 
     def delayed_queue_name(delay:)

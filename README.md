@@ -181,9 +181,6 @@ AdvancedSneakersActiveJob.configure do |config|
 
   # Connection for publisher (fallbacks to connection of consumers)
   config.publish_connection = Bunny.new('CUSTOM_URL', with: { other: 'options' })
-
-  # Unrouted messages republish requires extra connection and will try to "clone" publish_connection unless it is provided
-  config.republish_connection = Bunny.new('CUSTOM_URL', with: { other: 'options' })
 end
 ```
 

@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.4.0...HEAD)
 
+### Changed
+- [#16](https://github.com/veeqo/advanced-sneakers-activejob/pull/16) Switch to bunny-publisher v0.2 (drops republish connection)
 
 ## [0.4.0](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.3.6...v0.4.0) - 2020-11-17
 

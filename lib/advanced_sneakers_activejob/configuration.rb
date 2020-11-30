@@ -18,7 +18,10 @@ module AdvancedSneakersActiveJob
     config_accessor(:retry_delay_proc) { ->(count) { AdvancedSneakersActiveJob::EXPONENTIAL_BACKOFF[count] } } # seconds
 
     config_accessor(:publish_connection)
-    config_accessor(:republish_connection)
+
+    def republish_connection=(_)
+      ActiveSupport::Deprecation.warn('Republish connection is not used for bunny-publisher v0.2+')
+    end
 
     def sneakers
       custom_config = DEFAULT_SNEAKERS_CONFIG.deep_merge(config.sneakers || {})
@@ -35,7 +38,7 @@ module AdvancedSneakersActiveJob
     end
 
     def publisher_config
-      sneakers.merge(publish_connection: publish_connection, republish_connection: republish_connection)
+      sneakers.merge(publish_connection: publish_connection)
     end
   end
 end

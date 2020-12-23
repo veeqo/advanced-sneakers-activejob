@@ -11,6 +11,12 @@ Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 6. [Exponential backoff\*](#exponential-backoff)
 7. Exposes [`#delivery_info` & `#headers`](#amqp-metadata) AMQP metadata to job
 
+<p align="center">
+  <a href="https://www.veeqo.com/" title="Sponsored by Veeqo">
+    <img src="https://static.veeqo.com/assets/sponsored_by_veeqo.png" width="360" />
+  </a>
+</p>
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -192,4 +198,8 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/veeqo/
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
-## Sponsored by [Veeqo](https://veeqo.com/)
+## About [Veeqo](https://www.veeqo.com)
+
+At Veeqo, our team of Engineers is on a mission to create a world-class Inventory and Shipping platform, built to the highest standards in best coding practices. We are a growing team, looking for other passionate developers to [join us](https://veeqo-ltd.breezy.hr/) on our journey. If you're looking for a career working for one of the most exciting tech companies in ecommerce, we want to hear from you.
+
+[Veeqo developers blog](https://devs.veeqo.com)

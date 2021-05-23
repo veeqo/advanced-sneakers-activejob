@@ -9,11 +9,13 @@ module ChildProcessHelpers
     err_reader, err_writer = IO.pipe
     env = env.merge('RABBITMQ_URL' => ENV.fetch('RABBITMQ_URL'))
 
-    run_app_process(adapter: adapter, read: input_reader, write: output_writer, err: err_writer, env: env)
+    pid = run_app_process(adapter: adapter, read: input_reader, write: output_writer, err: err_writer, env: env)
 
     input_writer.write source_code(block) # Sending code block to separate process
     input_writer.close # At this point child process starts to evaluate input
     input_reader.close
+
+    Process.wait(pid)
 
     # At this point child process is expected to exit
     output_writer.close
@@ -60,19 +62,22 @@ module ChildProcessHelpers
     return unless File.exist?('sneakers.pid')
 
     kill_process(File.open('sneakers.pid').read.to_i)
-
-    FileUtils.rm('sneakers.pid')
+  ensure
+    FileUtils.rm_rf('sneakers.pid')
   end
 
   def kill_process(pid)
     Process.kill('TERM', pid)
 
-    loop do
-      Process.kill(0, pid)
-      sleep 0.01
+    begin
+      Timeout.timeout(5) do
+        sleep 0.1 until `pgrep -P #{pid}`.blank? # all processes of Sneakers are stopped
+      end
+    rescue Timeout::Error
+      `pgrep -P #{pid}`.lines.each { |child_pid| Process.kill('KILL', child_pid.to_i) }
     end
   rescue Errno::ESRCH
-    # process has died
+    # No such process
   end
 
   def source_code(block)

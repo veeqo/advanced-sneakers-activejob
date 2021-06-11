@@ -68,9 +68,11 @@ module AdvancedSneakersActiveJob
     end
 
     def calculate_delay(headers, delivery_info)
-      death_count = death_header(headers, queue_name(delivery_info)).fetch('count')
+      AdvancedSneakersActiveJob.config.retry_delay_proc.call(death_count(headers, delivery_info))
+    end
 
-      AdvancedSneakersActiveJob.config.retry_delay_proc.call(death_count)
+    def death_count(headers, delivery_info)
+      death_header(headers, queue_name(delivery_info)).fetch('count')
     end
 
     def queue_name(delivery_info)

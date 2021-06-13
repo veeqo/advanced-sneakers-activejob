@@ -94,7 +94,7 @@ describe 'Handler', :rabbitmq do
       context 'with max retries' do
         subject do
           in_app_process(adapter: :advanced_sneakers) do
-            Sneakers::CONFIG[:max_retries] = 2
+            Sneakers::CONFIG[:max_retries] = 1
             require 'rake'
             require 'sneakers/tasks'
             Rake::Task['sneakers:run'].invoke

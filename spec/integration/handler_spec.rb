@@ -91,6 +91,35 @@ describe 'Handler', :rabbitmq do
         expect(delayed_queues).to eq(['delayed:3', 'delayed:30', 'delayed:90'])
       end
 
+      context 'with max retries' do
+        subject do
+          in_app_process(adapter: :advanced_sneakers) do
+            Sneakers::CONFIG[:max_retries] = 1
+            require 'rake'
+            require 'sneakers/tasks'
+            Rake::Task['sneakers:run'].invoke
+          end
+
+          in_app_process(adapter: :advanced_sneakers) { CustomQueueJob.perform_later('failing job') }
+        end
+
+        it 'stops retrying' do
+          subject
+          sleep 0.1
+
+          expect(delayed_queues).to eq(['delayed:3'])
+
+          rabbitmq_messages('delayed:3', ackmode: 'reject_requeue_false') # simulate delayed message timeout
+
+          expect_logs name: 'sneakers',
+            to_include: [
+              'ERROR: [queue=custom] retries exhausted'
+            ]
+
+          expect(delayed_queues.sort).to contain_exactly('delayed:3')
+        end
+      end
+
       def delayed_queues
         rabbitmq_queues(columns: [:name]).select { |queue| queue.name.starts_with?('delayed:') }.map(&:name)
       end

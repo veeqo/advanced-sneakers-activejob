@@ -3,12 +3,23 @@
 module AdvancedSneakersActiveJob
   # Handler puts error details to message header and reenqueues job with delay
   class Handler < Sneakers::Handlers::Oneshot
+    def initialize(*args)
+      super
+      @max_retries = @opts[:max_retries]
+    end
+
     def error(delivery_info, properties, message, error)
       params = properties.to_h
       params[:headers] = patch_headers(params[:headers] || {}, delivery_info, error)
       params[:routing_key] = delivery_info.routing_key
 
-      AdvancedSneakersActiveJob.delayed_publisher.publish(message, params)
+      if @max_retries && death_count(params[:headers], delivery_info) > @max_retries
+        Sneakers.logger.error do
+          "[queue=#{queue_name(delivery_info)}] retries exhausted"
+        end
+      else
+        AdvancedSneakersActiveJob.delayed_publisher.publish(message, params)
+      end
 
       acknowledge(delivery_info, properties, message)
     end
@@ -68,9 +79,11 @@ module AdvancedSneakersActiveJob
     end
 
     def calculate_delay(headers, delivery_info)
-      death_count = death_header(headers, queue_name(delivery_info)).fetch('count')
+      AdvancedSneakersActiveJob.config.retry_delay_proc.call(death_count(headers, delivery_info))
+    end
 
-      AdvancedSneakersActiveJob.config.retry_delay_proc.call(death_count)
+    def death_count(headers, delivery_info)
+      death_header(headers, queue_name(delivery_info)).fetch('count')
     end
 
     def queue_name(delivery_info)

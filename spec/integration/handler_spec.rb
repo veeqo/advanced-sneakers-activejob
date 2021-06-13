@@ -94,7 +94,7 @@ describe 'Handler', :rabbitmq do
       context 'with max retries' do
         subject do
           in_app_process(adapter: :advanced_sneakers) do
-            Sneakers::CONFIG[:max_retries] = 5
+            Sneakers::CONFIG[:max_retries] = 2
             require 'rake'
             require 'sneakers/tasks'
             Rake::Task['sneakers:run'].invoke
@@ -110,31 +110,13 @@ describe 'Handler', :rabbitmq do
           expect(delayed_queues).to eq(['delayed:3'])
 
           rabbitmq_messages('delayed:3', ackmode: 'reject_requeue_false') # simulate delayed message timeout
-          sleep 0.1
-
-          expect(delayed_queues).to eq(['delayed:3', 'delayed:30'])
-
-          rabbitmq_messages('delayed:30', ackmode: 'reject_requeue_false') # simulate delayed message timeout
-          sleep 0.1
-
-          #TODO: override default max_retries to 2 to make this spec shorter
-   
-          expect(delayed_queues).to eq(['delayed:3', 'delayed:30', 'delayed:90'])
-
-          rabbitmq_messages('delayed:90', ackmode: 'reject_requeue_false')
-          sleep 0.1
-
-          expect(delayed_queues).to contain_exactly('delayed:3', 'delayed:30', 'delayed:90', 'delayed:240')
-
-          rabbitmq_messages('delayed:240', ackmode: 'reject_requeue_false')
-          sleep 0.1
 
           expect_logs name: 'sneakers',
             to_include: [
               'Retries exhausted'
             ]
 
-          expect(delayed_queues.sort).to contain_exactly('delayed:3', 'delayed:30', 'delayed:90', 'delayed:240')
+          expect(delayed_queues.sort).to contain_exactly('delayed:3')
         end
       end
 

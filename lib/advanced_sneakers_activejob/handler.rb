@@ -5,7 +5,7 @@ module AdvancedSneakersActiveJob
   class Handler < Sneakers::Handlers::Oneshot
     def initialize(*args)
       super
-      @max_retries = @opts[:max_retries] || 5
+      @max_retries = @opts[:max_retries]
     end
 
     def error(delivery_info, properties, message, error)
@@ -13,8 +13,7 @@ module AdvancedSneakersActiveJob
       params[:headers] = patch_headers(params[:headers] || {}, delivery_info, error)
       params[:routing_key] = delivery_info.routing_key
 
-      #TODO: make max-retries opt-in or at least handle nil
-      if death_count(params[:headers], delivery_info) >= @max_retries
+      if @max_retries && death_count(params[:headers], delivery_info) >= @max_retries
         Sneakers.logger.error message: "Retries exhausted", failed_message: message
       else
         AdvancedSneakersActiveJob.delayed_publisher.publish(message, params)

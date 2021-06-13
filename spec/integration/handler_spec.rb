@@ -113,7 +113,7 @@ describe 'Handler', :rabbitmq do
 
           expect_logs name: 'sneakers',
             to_include: [
-              'Retries exhausted'
+              'ERROR: [queue=custom] retries exhausted'
             ]
 
           expect(delayed_queues.sort).to contain_exactly('delayed:3')

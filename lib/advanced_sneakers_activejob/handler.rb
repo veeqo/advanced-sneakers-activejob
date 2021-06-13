@@ -14,7 +14,9 @@ module AdvancedSneakersActiveJob
       params[:routing_key] = delivery_info.routing_key
 
       if @max_retries && death_count(params[:headers], delivery_info) > @max_retries
-        Sneakers.logger.error message: "Retries exhausted", failed_message: message
+        Sneakers.logger.error do
+          "[queue=#{queue_name(delivery_info)}] retries exhausted"
+        end
       else
         AdvancedSneakersActiveJob.delayed_publisher.publish(message, params)
       end

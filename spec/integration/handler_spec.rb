@@ -91,6 +91,42 @@ describe 'Handler', :rabbitmq do
         expect(delayed_queues).to eq(['delayed:3', 'delayed:30', 'delayed:90'])
       end
 
+      context 'with retries exhausted' do
+        it 'stops retrying' do
+          subject
+          sleep 0.1
+
+          expect(delayed_queues).to eq(['delayed:3'])
+
+          rabbitmq_messages('delayed:3', ackmode: 'reject_requeue_false') # simulate delayed message timeout
+          sleep 0.1
+
+          expect(delayed_queues).to eq(['delayed:3', 'delayed:30'])
+
+          rabbitmq_messages('delayed:30', ackmode: 'reject_requeue_false') # simulate delayed message timeout
+          sleep 0.1
+
+          #TODO: override default max_retries to 2 to make this spec shorter
+   
+          expect(delayed_queues).to eq(['delayed:3', 'delayed:30', 'delayed:90'])
+
+          rabbitmq_messages('delayed:90', ackmode: 'reject_requeue_false')
+          sleep 0.1
+
+          expect(delayed_queues).to contain_exactly('delayed:3', 'delayed:30', 'delayed:90', 'delayed:240')
+
+          rabbitmq_messages('delayed:240', ackmode: 'reject_requeue_false')
+          sleep 0.1
+
+          expect(delayed_queues.sort).to contain_exactly('delayed:3', 'delayed:30', 'delayed:90', 'delayed:240')
+
+          expect_logs name: 'sneakers',
+            to_include: [
+              'Retries exhausted'
+            ]
+        end
+      end
+
       def delayed_queues
         rabbitmq_queues(columns: [:name]).select { |queue| queue.name.starts_with?('delayed:') }.map(&:name)
       end

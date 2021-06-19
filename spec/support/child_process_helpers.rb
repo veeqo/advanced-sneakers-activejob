@@ -7,6 +7,7 @@ module ChildProcessHelpers
     input_reader, input_writer = IO.pipe
     output_reader, output_writer = IO.pipe
     err_reader, err_writer = IO.pipe
+    env = env.merge('RABBITMQ_URL' => ENV.fetch('RABBITMQ_URL'))
 
     run_app_process(adapter: adapter, read: input_reader, write: output_writer, err: err_writer, env: env)
 

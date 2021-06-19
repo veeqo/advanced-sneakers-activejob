@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-Sneakers.configure amqp: 'amqp://guest:guest@localhost:5672/advanced_sneakers',
+Sneakers.configure amqp: ENV.fetch('RABBITMQ_URL'),
                    daemonize: true,
                    log: Rails.root.join('log/sneakers.log')

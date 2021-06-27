@@ -21,9 +21,8 @@ Gem::Specification.new do |spec|
     spec.metadata['changelog_uri'] = 'https://github.com/veeqo/advanced-sneakers-activejob/blob/master/CHANGELOG.md'
   end
 
-  spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(spec|\.ci)/}) }
-  end
+  spec.files = Dir['CHANGELOG.md', 'LICENSE.txt', 'README.md', 'lib/**/*']
+
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activejob', '>= 4.2'

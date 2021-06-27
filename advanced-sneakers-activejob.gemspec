@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   if spec.respond_to?(:metadata)
     spec.metadata['homepage_uri'] = spec.homepage
     spec.metadata['source_code_uri'] = spec.homepage
-    spec.metadata['changelog_uri'] = 'https://github.com/veeqo/advanced-sneakers-activejob/blob/master/CHANGELOG.md'
+    spec.metadata['changelog_uri'] = 'https://github.com/veeqo/advanced-sneakers-activejob/blob/main/CHANGELOG.md'
   end
 
   spec.files = Dir['CHANGELOG.md', 'LICENSE.txt', 'README.md', 'lib/**/*']

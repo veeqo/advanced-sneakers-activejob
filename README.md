@@ -1,5 +1,5 @@
 # `:advanced_sneakers` adapter for ActiveJob
-[![Build Status](https://github.com/veeqo/advanced-sneakers-activejob/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/veeqo/advanced-sneakers-activejob/actions/workflows/main.yml) [![Gem Version](https://badge.fury.io/rb/advanced-sneakers-activejob.svg)](https://badge.fury.io/rb/advanced-sneakers-activejob)
+[![Build Status](https://github.com/veeqo/advanced-sneakers-activejob/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/veeqo/advanced-sneakers-activejob/actions/workflows/main.yml) [![Gem Version](https://badge.fury.io/rb/advanced-sneakers-activejob.svg)](https://badge.fury.io/rb/advanced-sneakers-activejob)
 
 Drop-in replacement for `:sneakers` adapter of ActiveJob. Extra features:
 

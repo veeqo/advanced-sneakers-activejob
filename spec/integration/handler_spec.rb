@@ -98,6 +98,7 @@ describe 'Handler', :rabbitmq do
       describe 'retried job headers' do
         subject do
           super()
+          sleep 0.1
           rabbitmq_messages('delayed:3').first.properties.headers
         end
 

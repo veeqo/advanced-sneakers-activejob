@@ -187,6 +187,9 @@ AdvancedSneakersActiveJob.configure do |config|
 
   # Connection for publisher (fallbacks to connection of consumers)
   config.publish_connection = Bunny.new('CUSTOM_URL', with: { other: 'options' })
+
+  # Log level of "rake sneakers:active_job" output
+  config.log_level = :info
 end
 ```
 

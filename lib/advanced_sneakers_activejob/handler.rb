@@ -57,14 +57,8 @@ module AdvancedSneakersActiveJob
     end
 
     def track_error_in_headers(headers, error)
-      details = if error.respond_to?(:full_message) # ruby 2.5+
-                  error.full_message
-                else
-                  ([error.message] + error.backtrace).join("\n")
-                end
-
       headers['x-last-error-name'] = error.class.name
-      headers['x-last-error-details'] = Base64.encode64(ActiveSupport::Gzip.compress(details))
+      headers['x-last-error-details'] = Base64.encode64(ActiveSupport::Gzip.compress(error.full_message))
     end
 
     def calculate_delay(headers, delivery_info)

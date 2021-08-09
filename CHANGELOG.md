@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - [#24](https://github.com/veeqo/advanced-sneakers-activejob/pull/24) Test with ruby 3 and ActiveJob v6.1
+- [#26](https://github.com/veeqo/advanced-sneakers-activejob/pull/26) Make log level to be configurable
 
 ### Changed
 - [#22](https://github.com/veeqo/advanced-sneakers-activejob/pull/22) Migrate from Travis to Github Actions

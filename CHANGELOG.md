@@ -13,6 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - [#22](https://github.com/veeqo/advanced-sneakers-activejob/pull/22) Migrate from Travis to Github Actions
 
+### Removed
+- [#27](https://github.com/veeqo/advanced-sneakers-activejob/pull/27) Drop support of rubies older than 2.5
+
 
 ## [0.5.0](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.4.0...v0.5.0) - 2020-11-30
 

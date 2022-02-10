@@ -9,10 +9,10 @@ describe 'ActiveJob support of ActionMailer', :rabbitmq do
         in_app_process(adapter: :sneakers) { SampleMailer.greetings(name: 'Sneakers').deliver_later }
 
         expect_logs name: 'rails',
-                    to_include: 'Enqueued ActionMailer::DeliveryJob to Sneakers(mailers) with arguments: "SampleMailer", "greetings", "deliver_now", {:name=>"Sneakers"}',
+                    to_include: /Enqueued ActionMailer::(Mail)?DeliveryJob to Sneakers\(mailers\) with arguments: "SampleMailer", "greetings", "deliver_now", .*\{:name=>"Sneakers"\}/,
                     to_exclude: [
                       'Hello, Sneakers',
-                      'Performed ActionMailer::DeliveryJob'
+                      /Performed ActionMailer::(Mail)?DeliveryJob/
                     ]
       end
     end
@@ -25,9 +25,9 @@ describe 'ActiveJob support of ActionMailer', :rabbitmq do
 
         expect_logs name: 'rails',
                     to_include: [
-                      'Enqueued ActionMailer::DeliveryJob to AdvancedSneakers(mailers) with arguments: "SampleMailer", "greetings", "deliver_now", {:name=>"Advanced sneakers"}',
+                      /Enqueued ActionMailer::(Mail)?DeliveryJob to AdvancedSneakers\(mailers\) with arguments: "SampleMailer", "greetings", "deliver_now", .*\{:name=>"Advanced sneakers"\}/,
                       'Hello, Advanced sneakers',
-                      'Performed ActionMailer::DeliveryJob'
+                      /Performed ActionMailer::(Mail)?DeliveryJob/
                     ]
       end
     end
@@ -43,7 +43,7 @@ describe 'ActiveJob support of ActionMailer', :rabbitmq do
     end
 
     it 'does not have ActionMailer job consumer' do
-      expect(workers_class_names).not_to include('ActionMailer::DeliveryJob::Consumer')
+      expect(workers_class_names).not_to match(/ActionMailer::(Mail)?DeliveryJob::Consumer/)
     end
   end
 end

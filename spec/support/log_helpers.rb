@@ -12,16 +12,16 @@ module LogHelpers
       loop do
         @text = filter_logs(text: file.tap(&:rewind).read, filters: filters)
 
-        break if to_include.all? { |line| @text.include?(line) } &&
-                 to_exclude.none? { |line| @text.include?(line) }
+        break if to_include.all? { |line| @text.public_send(line_boolean_matcher(line), line) } &&
+                 to_exclude.none? { |line| @text.public_send(line_boolean_matcher(line), line) }
 
         sleep(0.05)
       end
     end
   rescue Timeout::Error
     aggregate_failures do
-      to_include.each { |line| expect(@text).to include(line) }
-      to_exclude.each { |line| expect(@text).not_to include(line) }
+      to_include.each { |line| expect(@text).to public_send(line_matcher(line), line) }
+      to_exclude.each { |line| expect(@text).not_to public_send(line_matcher(line), line) }
     end
   ensure
     file.close
@@ -32,6 +32,22 @@ module LogHelpers
   end
 
   private
+
+  def line_matcher(line)
+    case line
+    when String then :include
+    when Regexp then :match
+    else
+      raise ArgumentError, "unsupported class of 'line' argument: #{line.class}"
+    end
+  end
+
+  def line_boolean_matcher(line)
+    [
+      line_matcher(line).to_s,
+      '?'
+    ].join.to_sym
+  end
 
   def logs_path
     Pathname.new(File.expand_path('../apps/log', __dir__))

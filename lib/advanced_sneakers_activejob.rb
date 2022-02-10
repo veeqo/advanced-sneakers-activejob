@@ -25,8 +25,13 @@ ActiveSupport.on_load(:active_job) do
   ActiveJob::Base.include AdvancedSneakersActiveJob::ActiveJobPatch
 end
 
+# Enforce definition of ActionMailer consumers
 ActiveSupport.on_load(:action_mailer) do
-  require 'action_mailer/delivery_job' # Enforce definition of ActionMailer::DeliveryJob::Consumer
+  # https://github.com/rails/rails/commit/f5050d998def98563f8fa4b381c09f563681f159
+  require 'action_mailer/mail_delivery_job' if ActionMailer.gem_version >= Gem::Version.new('6.0.0')
+
+  # https://github.com/rails/rails/commit/ddc7fb6e6ee957aae35f1bb11d35c2d3e3b0cdda
+  require 'action_mailer/delivery_job' if ActionMailer.gem_version < Gem::Version.new('7.0.0')
 end
 
 # Advanced Sneakers adapter for ActiveJob

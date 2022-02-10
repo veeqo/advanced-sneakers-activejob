@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.5.0...HEAD)
 
 ### Added
+- [#30](https://github.com/veeqo/advanced-sneakers-activejob/pull/30) Add support for ActiveJob v7.0
+
+### Added
 - [#24](https://github.com/veeqo/advanced-sneakers-activejob/pull/24) Test with ruby 3 and ActiveJob v6.1
 - [#26](https://github.com/veeqo/advanced-sneakers-activejob/pull/26) Make log level to be configurable
 

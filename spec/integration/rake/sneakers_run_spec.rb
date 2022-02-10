@@ -27,7 +27,7 @@ describe 'rake sneakers:run', :rabbitmq do
                   to_include: [
                     "Performing 'sneakers worker data'",
                     "Performing 'activejob worker data'",
-                    'Performing ActionMailer::DeliveryJob'
+                    /Performing ActionMailer::(Mail)?DeliveryJob/
                   ]
     end
   end
@@ -48,7 +48,7 @@ describe 'rake sneakers:run', :rabbitmq do
                   to_include: "Performing 'sneakers worker data'",
                   to_exclude: [
                     "Performing 'activejob worker data'",
-                    'Performing ActionMailer::DeliveryJob'
+                    /Performing ActionMailer::(Mail)?DeliveryJob/
                   ]
     end
   end
@@ -68,7 +68,7 @@ describe 'rake sneakers:run', :rabbitmq do
       expect_logs name: 'rails',
                   to_include: [
                     "Performing 'activejob worker data'",
-                    'Performing ActionMailer::DeliveryJob'
+                    /Performing ActionMailer::(Mail)?DeliveryJob/
                   ],
                   to_exclude: "Performing 'sneakers worker data'"
     end
@@ -88,7 +88,7 @@ describe 'rake sneakers:run', :rabbitmq do
 
       expect_logs name: 'rails',
                   to_include: [
-                    'Performing ActionMailer::DeliveryJob'
+                    /Performing ActionMailer::(Mail)?DeliveryJob/
                   ],
                   to_exclude: [
                     "Performing 'activejob worker data'",

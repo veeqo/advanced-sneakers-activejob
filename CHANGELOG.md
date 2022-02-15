@@ -4,14 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.5.0...HEAD)
+## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.6.0...HEAD)
 
-### Added
-- [#30](https://github.com/veeqo/advanced-sneakers-activejob/pull/30) Add support for ActiveJob v7.0
+
+## [0.6.0](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.5.0...v0.6.0) - 2022-02-15
 
 ### Added
 - [#24](https://github.com/veeqo/advanced-sneakers-activejob/pull/24) Test with ruby 3 and ActiveJob v6.1
 - [#26](https://github.com/veeqo/advanced-sneakers-activejob/pull/26) Make log level to be configurable
+- [#30](https://github.com/veeqo/advanced-sneakers-activejob/pull/30) Add support for ActiveJob v7.0
 
 ### Changed
 - [#22](https://github.com/veeqo/advanced-sneakers-activejob/pull/22) Migrate from Travis to Github Actions

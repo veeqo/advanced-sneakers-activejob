@@ -167,7 +167,6 @@ describe 'Consumers' do
           AdvancedSneakersActiveJob.configure { |c| c.activejob_workers_strategy = :only }
 
           Sneakers::Worker::Classes.call.map { |consumer| [consumer.name, consumer.queue_name] }.to_h
-          ActionMailer::Base.deliver_later_queue_name.as_json
         end
       end
 

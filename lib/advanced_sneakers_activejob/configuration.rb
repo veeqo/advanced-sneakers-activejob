@@ -15,6 +15,7 @@ module AdvancedSneakersActiveJob
     config_accessor(:activejob_workers_strategy) { :include } # [:include, :exclude, :only]
     config_accessor(:delay_proc) { ->(timestamp) { (timestamp - Time.now.to_f).round } } # seconds
     config_accessor(:delayed_queue_prefix) { 'delayed' }
+    config_accessor(:delayed_queue_options) { { 'x-queue-mode' => 'lazy' } }
     config_accessor(:retry_delay_proc) { ->(count) { AdvancedSneakersActiveJob::EXPONENTIAL_BACKOFF[count] } } # seconds
     config_accessor(:log_level) { :info } # debug logs are too noizy because of Bunny
 

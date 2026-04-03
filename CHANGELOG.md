@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.6.0...HEAD)
 
+## [0.7.0] - 2026-03-07
+
+### Added
+- Support for Rails 7.1, 7.2, 8.0, 8.1
+- Delayed options customization
+
+### Removed
+- Support for Rails 4.2, 5.2
 
 ## [0.6.0](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.5.0...v0.6.0) - 2022-02-15
 

@@ -8,7 +8,7 @@ module AdvancedSneakersActiveJob
 
     delegate :logger, to: :'::ActiveJob::Base'
 
-    delegate :name_prefix, :delayed_queue_prefix,
+    delegate :name_prefix, :delayed_queue_prefix, :delayed_queue_options,
              to: :'AdvancedSneakersActiveJob.config',
              prefix: :config
 
@@ -33,11 +33,11 @@ module AdvancedSneakersActiveJob
     def declare_republish_queue
       queue_name = delayed_queue_name(delay: delay)
 
-      queue_arguments = {
+      queue_arguments = config_delayed_queue_options.merge(
         'x-queue-mode' => 'lazy', # tell RabbitMQ not to use RAM for this queue as it won't be consumed
         'x-message-ttl' => delay * 1000, # make messages die after requested time
         'x-dead-letter-exchange' => dlx_exchange_name # dead messages go to original exchange and then routed to proper queues
-      }
+      )
 
       logger.debug { "Creating delayed queue [#{queue_name}]" }
 

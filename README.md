@@ -175,6 +175,10 @@ AdvancedSneakersActiveJob.configure do |config|
   # Delayed queues can be filtered by this prefix (e.g. delayed:60 - queue for messages with 1 minute delay)
   config.delayed_queue_prefix = 'delayed'
 
+  # Delayed options can be customized (e.g. to remove 'x-queue-mode' => 'lazy' for Quorum queues)
+  # Default: { 'x-queue-mode' => 'lazy' }
+  # config.delayed_queue_options = {}
+
   # Custom sneakers configuration for ActiveJob publisher & runner
   config.sneakers = {
     connection: Bunny.new('CUSTOM_URL', with: { other: 'options' }),

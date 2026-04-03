@@ -21,7 +21,7 @@ describe AdvancedSneakersActiveJob::WorkersRegistry do
     subject { registry.foobar }
 
     it 'raises NoMethodError' do
-      expect { subject }.to raise_error(NoMethodError, /undefined method `foobar'/)
+      expect { subject }.to raise_error(NoMethodError, /undefined method [\`']foobar'/)
     end
   end
 end

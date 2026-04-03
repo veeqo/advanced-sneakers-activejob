@@ -24,24 +24,81 @@ jobs:
           - '2.6'
           - '2.7'
           - '3.0'
+          - '3.1'
+          - '3.2'
+          - '3.3'
+          - '3.4'
         gemfile:
-          - gemfiles/activejob_4.2.x.gemfile
-          - gemfiles/activejob_5.2.x.gemfile
           - gemfiles/activejob_6.0.x.gemfile
           - gemfiles/activejob_6.1.x.gemfile
           - gemfiles/activejob_7.0.x.gemfile
+          - gemfiles/activejob_7.1.x.gemfile
+          - gemfiles/activejob_8.0.x.gemfile
+          - gemfiles/activejob_8.1.x.gemfile
         exclude:
+          # --- Rails 8.0 & 8.1 (Require Ruby 3.2+) ---
+          # Exclude Ruby 2.5 to 3.1
+          - ruby: '2.5'
+            gemfile: gemfiles/activejob_8.0.x.gemfile
+          - ruby: '2.6'
+            gemfile: gemfiles/activejob_8.0.x.gemfile
           - ruby: '2.7'
-            gemfile: gemfiles/activejob_4.2.x.gemfile
+            gemfile: gemfiles/activejob_8.0.x.gemfile
           - ruby: '3.0'
-            gemfile: gemfiles/activejob_4.2.x.gemfile
+            gemfile: gemfiles/activejob_8.0.x.gemfile
+          - ruby: '3.1'
+            gemfile: gemfiles/activejob_8.0.x.gemfile
+          - ruby: '2.5'
+            gemfile: gemfiles/activejob_8.1.x.gemfile
+          - ruby: '2.6'
+            gemfile: gemfiles/activejob_8.1.x.gemfile
+          - ruby: '2.7'
+            gemfile: gemfiles/activejob_8.1.x.gemfile
           - ruby: '3.0'
-            gemfile: gemfiles/activejob_5.2.x.gemfile
+            gemfile: gemfiles/activejob_8.1.x.gemfile
+          - ruby: '3.1'
+            gemfile: gemfiles/activejob_8.1.x.gemfile
+
+          # --- Rails 7.2 (Requires Ruby 3.1+) ---
+          # Exclude Ruby 2.5 to 3.0
+          - ruby: '2.5'
+            gemfile: gemfiles/activejob_7.2.x.gemfile
+          - ruby: '2.6'
+            gemfile: gemfiles/activejob_7.2.x.gemfile
+          - ruby: '2.7'
+            gemfile: gemfiles/activejob_7.2.x.gemfile
+          - ruby: '3.0'
+            gemfile: gemfiles/activejob_7.2.x.gemfile
+
+          # --- Rails 7.0 & 7.1 (Require Ruby 2.7+) ---
+          # Exclude Ruby 2.5 and 2.6
           - ruby: '2.5'
             gemfile: gemfiles/activejob_7.0.x.gemfile
           - ruby: '2.6'
             gemfile: gemfiles/activejob_7.0.x.gemfile
+          - ruby: '2.5'
+            gemfile: gemfiles/activejob_7.1.x.gemfile
+          - ruby: '2.6'
+            gemfile: gemfiles/activejob_7.1.x.gemfile
 
+          # --- Rails 6.0 & 6.1 (Upper Bounds) ---
+          # Rails 6.0 and 6.1 do not officially support Ruby 3.1+ (many gems break)
+          - ruby: '3.1'
+            gemfile: gemfiles/activejob_6.0.x.gemfile
+          - ruby: '3.2'
+            gemfile: gemfiles/activejob_6.0.x.gemfile
+          - ruby: '3.3'
+            gemfile: gemfiles/activejob_6.0.x.gemfile
+          - ruby: '3.4'
+            gemfile: gemfiles/activejob_6.0.x.gemfile
+          - ruby: '3.1'
+            gemfile: gemfiles/activejob_6.1.x.gemfile
+          - ruby: '3.2'
+            gemfile: gemfiles/activejob_6.1.x.gemfile
+          - ruby: '3.3'
+            gemfile: gemfiles/activejob_6.1.x.gemfile
+          - ruby: '3.4'
+            gemfile: gemfiles/activejob_6.1.x.gemfile
     steps:
     - name: Checkout code
       uses: actions/checkout@v2

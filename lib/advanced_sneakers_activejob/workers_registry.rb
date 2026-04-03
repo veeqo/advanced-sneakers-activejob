@@ -70,15 +70,41 @@ module AdvancedSneakersActiveJob
       active_job_classes_with_matching_adapter.each do |worker|
         AdvancedSneakersActiveJob.define_consumer(queue_name: worker.new.queue_name)
       end
+
+      action_mailer_classes_with_matching_adapter.each do |mailer|
+        AdvancedSneakersActiveJob.define_consumer(queue_name: mailer_queue_name(mailer))
+      end
     end
 
     private
 
     def active_job_classes_with_matching_adapter
       ([ActiveJob::Base] + ActiveJob::Base.descendants).select do |klass|
-        klass.queue_adapter == ::ActiveJob::QueueAdapters::AdvancedSneakersAdapter ||
-          klass.queue_adapter.is_a?(::ActiveJob::QueueAdapters::AdvancedSneakersAdapter)
+        advanced_sneakers_adapter?(klass) &&
+          !(defined?(ActionMailer::Base) && klass == ActionMailer::MailDeliveryJob)
       end
+    end
+
+    def action_mailer_classes_with_matching_adapter
+      return [] if !defined?(ActionMailer::Base) ||
+                   ActionMailer.gem_version < Gem::Version.new('6.0.0') ||
+                   !advanced_sneakers_adapter?(ActionMailer::MailDeliveryJob)
+
+      ([ActionMailer::Base] + ActionMailer::Base.descendants).select do |klass|
+        klass.delivery_job == ActionMailer::MailDeliveryJob
+      end
+    end
+
+    def advanced_sneakers_adapter?(klass)
+      klass.queue_adapter == ::ActiveJob::QueueAdapters::AdvancedSneakersAdapter ||
+        klass.queue_adapter.is_a?(::ActiveJob::QueueAdapters::AdvancedSneakersAdapter)
+    end
+
+    # Gets the queue name for the mailer with activejob prefix and delimiter
+    # Queue name from ActionMailer::Base.deliver_later_queue_name is not prefixed
+    # and has no delimiter, so we need to add them manually
+    def mailer_queue_name(mailer)
+      [ActiveJob::Base.queue_name_prefix, mailer.deliver_later_queue_name.to_s].compact.join(ActiveJob::Base.queue_name_delimiter)
     end
   end
 end

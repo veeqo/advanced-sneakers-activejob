@@ -27,11 +27,11 @@ Gem::Specification.new do |spec|
 
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activejob', '>= 4.2'
+  spec.add_dependency 'activejob', '>= 6.0'
   spec.add_dependency 'bunny-publisher', '~> 0.2.0'
   spec.add_dependency 'sneakers', '~> 2.7'
 
-  spec.add_development_dependency 'appraisal', '~> 2.3.0'
+  spec.add_development_dependency 'appraisal', '~> 2.5.0'
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'pry-byebug'
   spec.add_development_dependency 'rabbitmq_http_api_client', '~> 1.13'

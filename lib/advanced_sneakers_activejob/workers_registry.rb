@@ -81,7 +81,7 @@ module AdvancedSneakersActiveJob
     def active_job_classes_with_matching_adapter
       ([ActiveJob::Base] + ActiveJob::Base.descendants).select do |klass|
         advanced_sneakers_adapter?(klass) &&
-          !(defined?(ActionMailer::Base) && klass == ActionMailer::MailDeliveryJob)
+          !(defined?(ActionMailer::Base) && klass <= ActionMailer::MailDeliveryJob)
       end
     end
 

@@ -31,6 +31,7 @@ jobs:
           - gemfiles/activejob_6.1.x.gemfile
           - gemfiles/activejob_7.0.x.gemfile
           - gemfiles/activejob_7.1.x.gemfile
+          - gemfiles/activejob_7.2.x.gemfile
           - gemfiles/activejob_8.0.x.gemfile
           - gemfiles/activejob_8.1.x.gemfile
         exclude:

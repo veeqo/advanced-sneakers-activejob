@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.6.0...HEAD)
 
+### Added
+- [#42](https://github.com/veeqo/advanced-sneakers-activejob/pull/42) Add support for ActiveJob v7.1 and v7.2 (including ActionMailer queue consumer detection)
+- [#42](https://github.com/veeqo/advanced-sneakers-activejob/pull/42) Add Ruby 3.3 and 3.4 to CI matrix
+
+### Changed
+- [#42](https://github.com/veeqo/advanced-sneakers-activejob/pull/42) Bump minimum Ruby version from 2.5 to 2.7
+
+### Removed
+- [#42](https://github.com/veeqo/advanced-sneakers-activejob/pull/42) Drop support for Ruby 2.5 and 2.6
+
 
 ## [0.6.0](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.5.0...v0.6.0) - 2022-02-15
 

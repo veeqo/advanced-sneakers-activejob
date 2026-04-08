@@ -19,6 +19,10 @@ appraise 'activejob-7.1.x' do
   gem 'rails', '~> 7.1.0'
 end
 
+appraise 'activejob-7.2.x' do
+  gem 'rails', '~> 7.2.0'
+end
+
 appraise 'activejob-8.0.x' do
   gem 'rails', '~> 8.0.0'
 end

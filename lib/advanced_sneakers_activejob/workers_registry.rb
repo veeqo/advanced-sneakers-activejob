@@ -104,7 +104,7 @@ module AdvancedSneakersActiveJob
     # Queue name from ActionMailer::Base.deliver_later_queue_name is not prefixed
     # and has no delimiter, so we need to add them manually
     def mailer_queue_name(mailer)
-      [ActiveJob::Base.queue_name_prefix, mailer.deliver_later_queue_name.to_s].compact.join(ActiveJob::Base.queue_name_delimiter)
+      [ActiveJob::Base.queue_name_prefix.presence, mailer.deliver_later_queue_name.to_s].compact.join(ActiveJob::Base.queue_name_delimiter)
     end
   end
 end

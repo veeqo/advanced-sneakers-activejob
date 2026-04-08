@@ -51,7 +51,6 @@ jobs:
 
           # --- Rails 7.2 (Requires Ruby 3.1+) ---
           # Exclude Ruby 2.7 to 3.0
-            gemfile: gemfiles/activejob_7.2.x.gemfile
           - ruby: '2.7'
             gemfile: gemfiles/activejob_7.2.x.gemfile
           - ruby: '3.0'

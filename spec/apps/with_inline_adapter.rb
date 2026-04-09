@@ -3,6 +3,7 @@
 require 'bundler/setup'
 require 'rails'
 require 'active_job/railtie'
+require 'action_controller/railtie'
 require 'action_mailer/railtie' unless ENV['SKIP_MAILER']
 
 $LOAD_PATH.unshift File.expand_path('../../../lib', __dir__)

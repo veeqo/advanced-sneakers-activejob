@@ -4,7 +4,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.6.0...HEAD)
+## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.7.0...HEAD)
+
+## [0.7.0](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.6.0...v0.7.0) - 2026-04-09
 
 ### Added
 - [#42](https://github.com/veeqo/advanced-sneakers-activejob/pull/42) Add support for ActiveJob v7.1 and v7.2 (including ActionMailer queue consumer detection)

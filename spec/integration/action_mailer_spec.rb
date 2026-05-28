@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 describe 'ActiveJob support of ActionMailer', :rabbitmq do
+  # Rails 6.x ActionMailer::DeliveryJob is incompatible with Ruby 3.4+
+  # keyword argument handling. CI excludes 6.x from 3.4+ runs.
+  before do
+    skip 'Known incompatibility: ActionMailer 6.x + Ruby 3.4+' if RUBY_VERSION >= '3.4' && ActiveJob.gem_version < Gem::Version.new('7.0')
+  end
+
   context 'when Rails application has ActionMailer enabled' do
     context 'when :sneakers adapter is used' do
       it 'loses emails' do

@@ -29,6 +29,14 @@ module AdvancedSneakersActiveJob
 
     # Headers are patched to mimic behavior of "nack" and DLX
     def track_death_in_headers(headers, queue, exchange, routing_key)
+      headers['x-retry-count'] = if headers.key?('x-retry-count')
+                                    headers['x-retry-count'] + 1
+                                  elsif (death = death_header(headers, queue))
+                                    death['count'] + 1
+                                  else
+                                    1
+                                  end
+
       headers['x-first-death-exchange'] ||= exchange
       headers['x-first-death-queue'] ||= queue
       headers['x-first-death-reason'] ||= 'rejected'
@@ -62,7 +70,7 @@ module AdvancedSneakersActiveJob
     end
 
     def calculate_delay(headers, delivery_info)
-      death_count = death_header(headers, queue_name(delivery_info)).fetch('count')
+      death_count = headers['x-retry-count'] || 1
 
       AdvancedSneakersActiveJob.config.retry_delay_proc.call(death_count)
     end
@@ -72,7 +80,7 @@ module AdvancedSneakersActiveJob
     end
 
     def death_header(headers, queue_name)
-      headers.fetch('x-death').detect { |death| death.fetch('queue') == queue_name }
+      headers.fetch('x-death', []).detect { |death| death.fetch('queue') == queue_name }
     end
   end
 end

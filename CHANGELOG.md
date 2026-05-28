@@ -4,7 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.7.0...HEAD)
+## [Unreleased](https://github.com/veeqo/advanced-sneakers-activejob/compare/v1.0.0...HEAD)
+
+## [1.0.0](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.7.0...v1.0.0) - 2026-05-27
+
+### Added
+- Add support for ActiveJob v8.0 and v8.1
+- Add Ruby 4.0 to CI matrix
+
+### Changed
+- Replace `sneakers ~> 2.7` dependency with `kicks` (a maintained fork of sneakers)
+- Bump minimum Ruby version from 2.7 to 3.1 (required by kicks)
+
+### Removed
+- Drop support for Ruby 2.7 and 3.0
+
+### Fixed
+- Fix test helpers for RabbitMQ 4.x compatibility (strip `x-queue-type` from queue arguments)
+- Fix `KeyError: key not found: "x-death"` in `Handler#death_header` when handling first job failure (headers have no `x-death` entry yet)
+- Fix integration tests leaving behind queues from sneakers daemon processes, causing test ordering failures
 
 ## [0.7.0](https://github.com/veeqo/advanced-sneakers-activejob/compare/v0.6.0...v0.7.0) - 2026-04-09
 

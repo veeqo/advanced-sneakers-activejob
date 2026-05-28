@@ -25,7 +25,10 @@ module RabbitmqHelpers
     end
 
     def queues(columns: %w[name passive durable exclusive auto_delete arguments])
-      client.list_queues(vhost, columns: columns.join(','))
+      client.list_queues(vhost, columns: columns.join(',')).map do |queue|
+        queue['arguments'].delete('x-queue-type') if queue['arguments']
+        queue
+      end
     end
 
     def messages(queue, ackmode: 'ack_requeue_true', count: 1, encoding: 'auto')
@@ -34,6 +37,13 @@ module RabbitmqHelpers
 
     def bindings(queue:, exchange: 'sneakers')
       client.list_bindings_between_queue_and_exchange(vhost, queue, exchange)
+    end
+
+    def delete_all_queues
+      queues_list = client.list_queues(vhost)
+      queues_list.each { |queue| client.delete_queue(vhost, queue['name']) }
+    rescue Faraday::ResourceNotFound
+      client.create_vhost(vhost)
     end
 
     private
@@ -55,10 +65,11 @@ module RabbitmqHelpers
     end
   end
 
-  delegate :reset_vhost, :queues, :messages, :bindings, to: :'RabbitmqHelpers.http_api', prefix: :rabbitmq
+  delegate :reset_vhost, :queues, :messages, :bindings, :delete_all_queues, to: :'RabbitmqHelpers.http_api', prefix: :rabbitmq
 end
 
 RSpec.configure do |config|
   config.include RabbitmqHelpers, :rabbitmq
-  config.before(:each, :rabbitmq) { rabbitmq_reset_vhost }
+
+  config.before(:each, :rabbitmq) { rabbitmq_delete_all_queues }
 end

@@ -76,23 +76,25 @@ describe 'Handler', :rabbitmq do
 
       it 'retries job with exponential backoff' do
         subject
-        sleep 0.1
-
-        expect(delayed_queues).to eq(['delayed:3'])
+        wait_for_queues(['delayed:3'])
 
         rabbitmq_messages('delayed:3', ackmode: 'reject_requeue_false') # simulate delayed message timeout
-        sleep 0.1
-
-        expect(delayed_queues).to eq(['delayed:3', 'delayed:30'])
+        wait_for_queues(%w[delayed:3 delayed:30])
 
         rabbitmq_messages('delayed:30', ackmode: 'reject_requeue_false') # simulate delayed message timeout
-        sleep 0.1
-
-        expect(delayed_queues).to eq(['delayed:3', 'delayed:30', 'delayed:90'])
+        wait_for_queues(%w[delayed:3 delayed:30 delayed:90])
       end
 
       def delayed_queues
         rabbitmq_queues(columns: [:name]).select { |queue| queue.name.starts_with?('delayed:') }.map(&:name)
+      end
+
+      def wait_for_queues(expected)
+        Timeout.timeout(1) do
+          sleep 0.05 until delayed_queues == expected
+        end
+      rescue Timeout::Error
+        expect(delayed_queues).to eq(expected)
       end
 
       describe 'retried job headers' do

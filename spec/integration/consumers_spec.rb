@@ -68,11 +68,7 @@ describe 'Consumers' do
         'AdvancedSneakersActiveJob::CustomDynamicConsumer' => 'custom:dynamic' # dynamic queue consumer for DynamicQueueJob
       }
 
-      if ActiveJob.gem_version >= Gem::Version.new('6.0') # https://github.com/rails/rails/pull/34376
-        expected_consumers['AdvancedSneakersActiveJob::CustomDefaultConsumer'] = 'custom:default'
-      else
-        expected_consumers['AdvancedSneakersActiveJob::DefaultConsumer'] = 'default'
-      end
+      expected_consumers['AdvancedSneakersActiveJob::CustomDefaultConsumer'] = 'custom:default'
 
       expect(subject.first).to eq(expected_consumers)
     end
@@ -152,8 +148,7 @@ describe 'Consumers' do
 
   # Support for mailer specific queue name was added in Rails 7.1
   # https://github.com/rails/rails/pull/47408
-  if ActiveJob.gem_version >= Gem::Version.new('7.1')
-    context 'when there are ActionMailer classes with queue defined' do
+  context 'when there are ActionMailer classes with queue defined' do
       subject do
         in_app_process(adapter: :advanced_sneakers) do
           class FooMailer < ActionMailer::Base
@@ -218,5 +213,4 @@ describe 'Consumers' do
         expect(subject.first).to eq(expected_consumers)
       end
     end
-  end
 end

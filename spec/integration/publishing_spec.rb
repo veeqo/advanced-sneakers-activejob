@@ -362,37 +362,21 @@ describe 'Publishing', :rabbitmq do
       end
     end
 
-    if ActiveJob.gem_version >= Gem::Version.new('6.0') # https://github.com/rails/rails/pull/34376
-      it 'creates proper queues' do
-        expect do
-          subject
-        end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['awesome:custom', 'awesome:default'])
-      end
-
-      it 'messages are not lost' do
+    it 'creates proper queues' do
+      expect do
         subject
+      end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['awesome:custom', 'awesome:default'])
+    end
 
-        expect(rabbitmq_messages('awesome:default').first['payload']).to include('Application job')
-        expect(rabbitmq_messages('awesome:custom').first['payload']).to include('Custom queue job')
-      end
-    else
-      it 'creates proper queues' do
-        expect do
-          subject
-        end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['awesome:custom', 'default'])
-      end
+    it 'messages are not lost' do
+      subject
 
-      it 'messages are not lost' do
-        subject
-
-        expect(rabbitmq_messages('default').first['payload']).to include('Application job')
-        expect(rabbitmq_messages('awesome:custom').first['payload']).to include('Custom queue job')
-      end
+      expect(rabbitmq_messages('awesome:default').first['payload']).to include('Application job')
+      expect(rabbitmq_messages('awesome:custom').first['payload']).to include('Custom queue job')
     end
   end
 
-  if ActiveJob.gem_version >= Gem::Version.new('5.0')
-    context 'when there are ActiveJob classes with custom queue adapter' do
+  context 'when there are ActiveJob classes with custom queue adapter' do
       subject do
         in_app_process(adapter: :advanced_sneakers) do
           AdvancedSneakersActiveJob.configure { |c| c.handle_unrouted_messages = true }
@@ -437,5 +421,4 @@ describe 'Publishing', :rabbitmq do
         end.to change { rabbitmq_queues(columns: [:name]).map(&:name).sort }.from([]).to(['bar']) # no "custom"
       end
     end
-  end
 end

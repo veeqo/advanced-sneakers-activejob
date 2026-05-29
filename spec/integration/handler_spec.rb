@@ -22,7 +22,7 @@ describe 'Handler', :rabbitmq do
   end
 
   context 'when job is failing' do
-    context 'when failure is handled by ActiveJob', if: ActiveJob.gem_version >= Gem::Version.new('5.1') do
+    context 'when failure is handled by ActiveJob' do
       subject do
         in_app_process(adapter: :advanced_sneakers) do
           CustomQueueJob.discard_on 'StandardError'
@@ -56,22 +56,13 @@ describe 'Handler', :rabbitmq do
       it 'handles job retries' do
         subject
 
-        if ActiveJob.gem_version >= Gem::Version.new('5.1')
-          expect_logs name: 'rails',
-                      to_include: [
-                        'Performing CustomQueueJob from AdvancedSneakers(custom) with arguments: "failing job"',
-                        'to [activejob-delayed] with routing_key [custom] and delay [3]',
-                        'Creating delayed queue'
-                      ],
-                      to_exclude: 'Performed CustomQueueJob from AdvancedSneakers(custom)'
-        else
-          expect_logs name: 'rails',
-                      to_include: [
-                        'Performing CustomQueueJob from AdvancedSneakers(custom) with arguments: "failing job"',
-                        'to [activejob-delayed] with routing_key [custom] and delay [3]',
-                        'Creating delayed queue'
-                      ]
-        end
+        expect_logs name: 'rails',
+                    to_include: [
+                      'Performing CustomQueueJob from AdvancedSneakers(custom) with arguments: "failing job"',
+                      'to [activejob-delayed] with routing_key [custom] and delay [3]',
+                      'Creating delayed queue'
+                    ],
+                    to_exclude: 'Performed CustomQueueJob from AdvancedSneakers(custom)'
       end
 
       it 'retries job with exponential backoff' do

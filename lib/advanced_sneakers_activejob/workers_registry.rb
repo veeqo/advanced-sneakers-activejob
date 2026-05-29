@@ -87,7 +87,6 @@ module AdvancedSneakersActiveJob
 
     def action_mailer_classes_with_matching_adapter
       return [] if !defined?(ActionMailer::Base) ||
-                   ActionMailer.gem_version < Gem::Version.new('6.0.0') ||
                    !advanced_sneakers_adapter?(ActionMailer::MailDeliveryJob)
 
       ([ActionMailer::Base] + ActionMailer::Base.descendants).select do |klass|

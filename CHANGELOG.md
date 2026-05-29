@@ -14,10 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - Replace `sneakers ~> 2.7` dependency with `kicks` (a maintained fork of sneakers)
-- Bump minimum Ruby version from 2.7 to 3.1 (required by kicks)
+- Bump minimum Ruby version from 2.7 to 3.3
+- Bump minimum ActiveJob version from 6.0 to 7.1
 
 ### Removed
-- Drop support for Ruby 2.7 and 3.0
+- Drop support for Ruby 2.7, 3.0, 3.1, and 3.2
+- Drop support for ActiveJob 6.0, 6.1, and 7.0
 
 ### Fixed
 - Fix test helpers for RabbitMQ 4.x compatibility (strip `x-queue-type` from queue arguments)

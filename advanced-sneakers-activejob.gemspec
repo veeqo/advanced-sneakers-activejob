@@ -23,11 +23,11 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir['CHANGELOG.md', 'LICENSE.txt', 'README.md', 'lib/**/*']
 
-  spec.required_ruby_version = '>= 3.1'
+  spec.required_ruby_version = '>= 3.3'
 
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activejob', '>= 6.0'
+  spec.add_dependency 'activejob', '>= 7.1'
   spec.add_dependency 'bunny-publisher', '~> 0.2.0'
   spec.add_dependency 'kicks'
 

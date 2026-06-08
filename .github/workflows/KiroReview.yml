@@ -1,0 +1,37 @@
+name: Kiro review
+
+# Calls the centralized reusable workflow in veeqo/org-wide-actions.
+# All review logic (key pool, App token, draft gating, fork safety)
+# lives there — this file only defines the triggers and lightweight
+# gates to avoid unnecessary runner allocation. Future changes to the
+# review pipeline are transparent; no edits needed here.
+#
+# Note: concurrency serialization lives inside the reusable workflow,
+# not here. Declaring it at both levels causes a GitHub deadlock error.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  issue_comment:
+    types: [created]
+
+jobs:
+  review:
+    # Lightweight gate so non-matching events short-circuit before
+    # invoking the reusable workflow and allocating a runner:
+    # - pull_request: same-repo only (no forks), non-draft
+    # - issue_comment: must be on a PR and contain the trigger phrase
+    if: >
+      (github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request &&
+        contains(github.event.comment.body, '@kiro')) ||
+      (github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        github.event.pull_request.draft == false)
+    uses: veeqo/org-wide-actions/.github/workflows/kiro-review-reusable.yml@v1
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      security-events: read
+    secrets: inherit
